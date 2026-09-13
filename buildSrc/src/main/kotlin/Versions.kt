@@ -15,7 +15,7 @@ object Versions {
 
     const val PACKET_EVENTS = "2.13.0"
     const val SHOPGUI_API = "3.2.0"
-    const val ENTITY_LIB = "3.3.6-20260721.155727-1"
+    const val ENTITY_LIB = "3.3.7-SNAPSHOT"
     const val X_SERIES = "13.7.1"
     const val INVENTORY_FRAMEWORK = "0.12.0"
     const val FASTUTIL = "8.5.16"
