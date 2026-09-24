@@ -37,11 +37,6 @@ public final class MinionBlockProtectionController implements Listener {
         return this.minions.hasMinionAt(
                 worldKey,
                 block.getX(),
-                block.getY() + 1,
-                block.getZ()
-        ) || this.minions.hasMinionAt(
-                worldKey,
-                block.getX(),
                 block.getY(),
                 block.getZ()
         ) || this.minions.hasMinionAt(
