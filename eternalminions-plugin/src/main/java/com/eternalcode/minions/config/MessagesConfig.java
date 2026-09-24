@@ -44,6 +44,7 @@ public final class MessagesConfig extends ConfigurationFile {
     public Notice chestLinked = Notice.chat(prefix() + "<green>Chest linked to the minion.");
     public Notice chestUnlinked = Notice.chat(prefix() + "<green>Chest unlinked from the minion.");
     public Notice chestLinkTooFar = Notice.chat(prefix() + "<red>That chest is too far away from the minion.");
+    public Notice chestLinkUnsupported = Notice.chat(prefix() + "<red>A minion cannot be linked to this container.");
     public Notice chestLinkExpired = Notice.chat(prefix() + "<red>Chest selection timed out.");
     public Notice chestLinkDestroyed =
         Notice.chat(prefix() + "<red>The container linked to your minion was destroyed, so the link was removed.");

@@ -1,5 +1,6 @@
 package com.eternalcode.minions.minion.storage;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MessagesConfig;
@@ -108,6 +109,16 @@ public final class ChestLinkService implements Listener {
         Block block = event.getClickedBlock();
 
         if (block == null || !(block.getState(false) instanceof Container)) {
+            return;
+        }
+
+        if (!this.config.chestLinkContainers.contains(XMaterial.matchXMaterial(block.getType()))) {
+            event.setCancelled(true);
+            this.notices.create()
+                    .viewer(player)
+                    .notice(this.messages.chestLinkUnsupported)
+                    .send();
+
             return;
         }
 

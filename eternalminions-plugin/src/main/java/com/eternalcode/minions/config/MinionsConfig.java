@@ -1,5 +1,6 @@
 package com.eternalcode.minions.config;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.minion.activity.config.ActivityBypassConfig;
 import com.eternalcode.minions.minion.activity.rule.loadedchunk.LoadedChunkConfig;
 import com.eternalcode.minions.minion.activity.rule.offline.OfflineConfig;
@@ -61,6 +62,9 @@ public final class MinionsConfig extends ConfigurationFile {
 
     @Comment("Seconds the player has to click a chest after starting link mode.")
     public int chestLinkTimeoutSeconds = 10;
+
+    @Comment("Containers a minion can be linked to.")
+    public List<XMaterial> chestLinkContainers = List.of(XMaterial.CHEST, XMaterial.TRAPPED_CHEST, XMaterial.BARREL);
 
     @Comment("Hologram lines rendered above every minion. Supports MiniMessage.")
     public HologramConfig hologram = new HologramConfig();
