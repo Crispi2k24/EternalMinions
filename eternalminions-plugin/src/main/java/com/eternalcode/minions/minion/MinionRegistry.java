@@ -129,6 +129,75 @@ public final class MinionRegistry {
         return null;
     }
 
+    public List<Minion> findWithin(MinionPosition from, MinionPosition to) {
+        if (!from.worldKey().equals(to.worldKey())) {
+            throw new IllegalArgumentException("Area corners must be in the same world");
+        }
+
+        Long2ObjectOpenHashMap<LongOpenHashSet> worldChunks = this.minionsByWorldChunk.get(from.worldKey());
+
+        if (worldChunks == null) {
+            return List.of();
+        }
+
+        int minX = Math.min(from.blockX(), to.blockX());
+        int minY = Math.min(from.blockY(), to.blockY());
+        int minZ = Math.min(from.blockZ(), to.blockZ());
+        int maxX = Math.max(from.blockX(), to.blockX());
+        int maxY = Math.max(from.blockY(), to.blockY());
+        int maxZ = Math.max(from.blockZ(), to.blockZ());
+        long areaChunks = ((long) (maxX >> 4) - (minX >> 4) + 1) * ((long) (maxZ >> 4) - (minZ >> 4) + 1);
+        List<Minion> found = new ArrayList<>();
+
+        if (areaChunks > worldChunks.size()) {
+            for (LongOpenHashSet ids : worldChunks.values()) {
+                this.collectWithin(ids, minX, minY, minZ, maxX, maxY, maxZ, found);
+            }
+            return found;
+        }
+
+        for (int chunkX = minX >> 4; chunkX <= maxX >> 4; chunkX++) {
+            for (int chunkZ = minZ >> 4; chunkZ <= maxZ >> 4; chunkZ++) {
+                LongOpenHashSet ids = worldChunks.get(chunkKey(chunkX, chunkZ));
+
+                if (ids != null) {
+                    this.collectWithin(ids, minX, minY, minZ, maxX, maxY, maxZ, found);
+                }
+            }
+        }
+
+        return found;
+    }
+
+    private void collectWithin(
+            LongOpenHashSet ids,
+            int minX,
+            int minY,
+            int minZ,
+            int maxX,
+            int maxY,
+            int maxZ,
+            List<Minion> found
+    ) {
+        LongIterator iterator = ids.iterator();
+
+        while (iterator.hasNext()) {
+            Minion minion = this.minions.get(iterator.nextLong());
+
+            if (minion == null) {
+                continue;
+            }
+
+            MinionPosition position = minion.position();
+
+            if (position.blockX() >= minX && position.blockX() <= maxX
+                    && position.blockY() >= minY && position.blockY() <= maxY
+                    && position.blockZ() >= minZ && position.blockZ() <= maxZ) {
+                found.add(minion);
+            }
+        }
+    }
+
     public void forEachMinionIdInChunk(String worldKey, int chunkX, int chunkZ, LongConsumer action) {
         Long2ObjectOpenHashMap<LongOpenHashSet> worldChunks = this.minionsByWorldChunk.get(worldKey);
         if (worldChunks == null) {

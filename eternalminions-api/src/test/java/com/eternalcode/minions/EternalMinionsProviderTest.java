@@ -129,5 +129,13 @@ class EternalMinionsProviderTest {
         ) {
             return Optional.empty();
         }
+
+        @Override
+        public Collection<com.eternalcode.minions.minion.MinionDetails> findWithin(
+            com.eternalcode.minions.minion.MinionPosition from,
+            com.eternalcode.minions.minion.MinionPosition to
+        ) {
+            return List.of();
+        }
     }
 }

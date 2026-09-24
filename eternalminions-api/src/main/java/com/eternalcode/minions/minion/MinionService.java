@@ -28,4 +28,6 @@ public interface MinionService {
 
     /** Finds a live minion occupying the exact block position. */
     @NotNull Optional<MinionDetails> findAt(@NotNull MinionPosition position);
+
+    @NotNull Collection<MinionDetails> findWithin(@NotNull MinionPosition from, @NotNull MinionPosition to);
 }

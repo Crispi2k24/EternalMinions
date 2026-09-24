@@ -56,6 +56,26 @@ class MinionRegistryTest {
     }
 
     @Test
+    void findsMinionsWithinArea() {
+        MinionRegistry registry = new MinionRegistry();
+        Minion inside = createMinion(new MinionId(1), new MinionPosition("world", 40, 64, -20));
+        Minion outside = createMinion(new MinionId(2), new MinionPosition("world", 200, 64, -20));
+        Minion otherWorld = createMinion(new MinionId(3), new MinionPosition("nether", 40, 64, -20));
+        registry.register(inside);
+        registry.register(outside);
+        registry.register(otherWorld);
+
+        assertThat(registry.findWithin(
+                new MinionPosition("world", 100, 0, 0),
+                new MinionPosition("world", 0, 128, -50)
+        )).containsExactly(inside);
+        assertThat(registry.findWithin(
+                new MinionPosition("world", -30_000_000, -64, -30_000_000),
+                new MinionPosition("world", 30_000_000, 320, 30_000_000)
+        )).containsExactlyInAnyOrder(inside, outside);
+    }
+
+    @Test
     void createsIdAfterHighestRestoredId() {
         MinionRegistry registry = new MinionRegistry();
         long restoredId = 10_000_000_000_000L;

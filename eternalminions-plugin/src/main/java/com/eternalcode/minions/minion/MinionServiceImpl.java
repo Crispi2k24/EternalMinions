@@ -66,6 +66,15 @@ public final class MinionServiceImpl implements MinionService {
         return this.minions.findAt(position).map(Minion::details);
     }
 
+    @Override
+    public Collection<MinionDetails> findWithin(MinionPosition from, MinionPosition to) {
+        List<MinionDetails> details = new ArrayList<>();
+        for (Minion minion : this.minions.findWithin(from, to)) {
+            details.add(minion.details());
+        }
+        return List.copyOf(details);
+    }
+
     private MinionSnapshot snapshot(Minion minion) {
         return minion.snapshot(this.statuses.status(minion.id()));
     }
