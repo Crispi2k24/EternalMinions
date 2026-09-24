@@ -2,6 +2,7 @@ package com.eternalcode.minions;
 
 import com.eternalcode.minions.access.MinionAccessService;
 import com.eternalcode.minions.behavior.MinionBehaviorService;
+import com.eternalcode.minions.economy.MinionEconomyService;
 import com.eternalcode.minions.item.MinionItemService;
 import com.eternalcode.minions.minion.MinionManagementService;
 import com.eternalcode.minions.minion.MinionService;
@@ -15,6 +16,7 @@ record EternalMinionsApiImpl(
     MinionItemService minionItemService,
     MinionStatusService minionStatusService,
     MinionAccessService minionAccessService,
-    MinionShopService minionShopService
+    MinionShopService minionShopService,
+    MinionEconomyService minionEconomyService
 ) implements EternalMinionsApi {
 }

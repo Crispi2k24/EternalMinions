@@ -1,6 +1,7 @@
 package com.eternalcode.minions;
 
 import com.eternalcode.minions.bridge.BridgeManager;
+import com.eternalcode.minions.bridge.economy.MinionEconomyServiceImpl;
 import com.eternalcode.minions.bridge.shop.MinionShopServiceImpl;
 import com.eternalcode.minions.bridge.shop.ShopBridges;
 import com.eternalcode.minions.bridge.vault.VaultBridge;
@@ -149,6 +150,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         );
         this.shopService = new MinionShopServiceImpl(this.getLogger(), shopHooks);
         this.getServer().getPluginManager().registerEvents(this.shopService, this);
+        MinionEconomyServiceImpl economyService = new MinionEconomyServiceImpl(this.getLogger(), economy);
+        this.getServer().getPluginManager().registerEvents(economyService, this);
         this.getServer().getPluginManager().registerEvents(killerLooting, this);
 
         behaviors.replace(MinionBehaviorRegistry.createEnabled(
@@ -241,7 +244,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                         actorId),
                 messages,
                 notices,
-                economy,
+                Optional.of(economyService),
                 statusTracker,
                 events
         );
@@ -343,7 +346,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 itemApi,
                 statusApi,
                 this.minionAccess,
-                this.shopService
+                this.shopService,
+                economyService
         ));
         this.apiInitialized = true;
         this.getLogger().info("EternalMinions initialized with renderer " + minionsConfig.minionRenderer + ".");

@@ -80,6 +80,11 @@ class EternalMinionsProviderTest {
         public com.eternalcode.minions.shop.MinionShopService minionShopService() {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public com.eternalcode.minions.economy.MinionEconomyService minionEconomyService() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private static final class EmptyMinionService implements MinionService {

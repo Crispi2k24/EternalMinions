@@ -2,6 +2,7 @@ package com.eternalcode.minions;
 
 import com.eternalcode.minions.access.MinionAccessService;
 import com.eternalcode.minions.behavior.MinionBehaviorService;
+import com.eternalcode.minions.economy.MinionEconomyService;
 import com.eternalcode.minions.item.MinionItemService;
 import com.eternalcode.minions.minion.MinionManagementService;
 import com.eternalcode.minions.minion.MinionService;
@@ -39,4 +40,6 @@ public interface EternalMinionsApi {
 
     /** Returns the extension point used to connect an external selling provider. */
     @NotNull MinionShopService minionShopService();
+
+    @NotNull MinionEconomyService minionEconomyService();
 }
