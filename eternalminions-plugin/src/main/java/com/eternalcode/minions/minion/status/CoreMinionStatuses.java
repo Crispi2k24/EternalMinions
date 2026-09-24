@@ -7,6 +7,7 @@ public final class CoreMinionStatuses {
     public static final MinionStatus STORAGE_FULL = MinionStatus.of("STORAGE_FULL");
     public static final MinionStatus OFFLINE = MinionStatus.of("OFFLINE");
     public static final MinionStatus AWAY = MinionStatus.of("AWAY");
+    public static final MinionStatus BLOCKED = MinionStatus.of("BLOCKED");
 
     private CoreMinionStatuses() {
     }

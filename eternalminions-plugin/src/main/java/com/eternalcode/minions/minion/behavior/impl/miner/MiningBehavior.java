@@ -200,6 +200,9 @@ public final class MiningBehavior implements MinionBehavior {
         if (!this.transfers.canStoreAll(context, minion.storage(), drops)) {
             return MinionResult.idle(minion, CoreMinionStatuses.STORAGE_FULL);
         }
+        if (!context.mayBreak(block)) {
+            return null;
+        }
         block.setType(Material.AIR, true);
         Minion updated = this.tools.consume(minion, 1);
         updated = this.transfers.deposit(context, updated, block.getLocation(), drops);

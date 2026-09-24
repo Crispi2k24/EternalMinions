@@ -2,6 +2,7 @@ package com.eternalcode.minions.minion.schedule;
 
 import com.eternalcode.minions.config.MinionsConfig;
 import com.eternalcode.minions.database.MinionPersistenceService;
+import com.eternalcode.minions.event.EventDispatcher;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.MinionRegistry;
 import com.eternalcode.minions.minion.activity.ActivityDecision;
@@ -31,6 +32,7 @@ public final class MinionScheduler implements Runnable {
     private final MinionStatusTracker statusTracker;
     private final MinionRenderer renderer;
     private final MinionActivityService activityService;
+    private final EventDispatcher events;
     private final MinionSchedule minionSchedule = new MinionSchedule(128);
     private long currentTick;
 
@@ -42,7 +44,8 @@ public final class MinionScheduler implements Runnable {
             MinionPersistenceService persistenceService,
             MinionStatusTracker statusTracker,
             MinionRenderer renderer,
-            MinionActivityService activityService
+            MinionActivityService activityService,
+            EventDispatcher events
     ) {
         this.server = server;
         this.minionRegistry = minionRegistry;
@@ -52,6 +55,7 @@ public final class MinionScheduler implements Runnable {
         this.statusTracker = statusTracker;
         this.renderer = renderer;
         this.activityService = activityService;
+        this.events = events;
     }
 
     public void add(Minion minion) {
@@ -111,7 +115,8 @@ public final class MinionScheduler implements Runnable {
                 minion,
                 world,
                 scheduledMinion,
-                decision.executionPolicy()
+                decision.executionPolicy(),
+                this.events
         ));
         if (decision.statusOverride() != null && result.status() != decision.statusOverride()) {
             result = new MinionResult(result.minion(), decision.statusOverride(), result.worked(), result.delayTicks());

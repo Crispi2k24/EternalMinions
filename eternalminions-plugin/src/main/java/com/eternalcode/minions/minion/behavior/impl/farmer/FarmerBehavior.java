@@ -296,6 +296,10 @@ public final class FarmerBehavior implements MinionBehavior {
             return MinionResult.idle(minion, CoreMinionStatuses.STORAGE_FULL);
         }
 
+        if (!context.mayBreak(crop)) {
+            return null;
+        }
+
         ageable.setAge(0);
         crop.setBlockData(ageable, false);
 
@@ -325,6 +329,10 @@ public final class FarmerBehavior implements MinionBehavior {
             return MinionResult.idle(minion, CoreMinionStatuses.STORAGE_FULL);
         }
 
+        if (!context.mayBreak(harvested)) {
+            return null;
+        }
+
         harvested.setType(Material.AIR, false);
 
         return this.finishHarvest(
@@ -345,6 +353,10 @@ public final class FarmerBehavior implements MinionBehavior {
         List<ItemStack> drops = BlockDrops.collect(fruit, tool);
         if (!this.transfers.canStoreAll(context, minion.storage(), drops)) {
             return MinionResult.idle(minion, CoreMinionStatuses.STORAGE_FULL);
+        }
+
+        if (!context.mayBreak(fruit)) {
+            return null;
         }
 
         fruit.setType(Material.AIR, false);

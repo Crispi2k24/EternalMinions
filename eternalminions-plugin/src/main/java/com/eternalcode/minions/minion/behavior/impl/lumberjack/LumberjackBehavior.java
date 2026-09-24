@@ -310,6 +310,17 @@ public final class LumberjackBehavior implements MinionBehavior {
             return MinionResult.idle(minion, CoreMinionStatuses.STORAGE_FULL);
         }
 
+        if (
+                !this.mayBreak(context, tree.hives())
+                        || !this.mayBreak(context, tree.leaves())
+                        || !this.mayBreak(context, tree.logs())
+        ) {
+            return MinionResult.idle(
+                    minion,
+                    CoreMinionStatuses.BLOCKED
+            );
+        }
+
         this.breakBlocks(
                 context,
                 tree.hives()
@@ -366,6 +377,25 @@ public final class LumberjackBehavior implements MinionBehavior {
 
             BlockDrops.collectInto(block, tool, destination);
         }
+    }
+
+    private boolean mayBreak(
+            MinionContext context,
+            TreeScanner.PositionBuffer blocks
+    ) {
+        for (int index = 0; index < blocks.size(); index++) {
+            Block block = context.world().getBlockAt(
+                    blocks.x(index),
+                    blocks.y(index),
+                    blocks.z(index)
+            );
+
+            if (!context.mayBreak(block)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void breakBlocks(

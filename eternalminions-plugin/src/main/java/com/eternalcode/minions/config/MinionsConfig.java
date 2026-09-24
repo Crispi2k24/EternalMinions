@@ -39,6 +39,7 @@ public final class MinionsConfig extends ConfigurationFile {
         statuses.put(CoreMinionStatuses.STORAGE_FULL, "<red>Storage full");
         statuses.put(CoreMinionStatuses.OFFLINE, "<dark_gray>Owner offline");
         statuses.put(CoreMinionStatuses.AWAY, "<dark_gray>Owner out of range");
+        statuses.put(CoreMinionStatuses.BLOCKED, "<red>Blocked by protection");
         return statuses;
     }
 

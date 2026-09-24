@@ -1,5 +1,7 @@
 package com.eternalcode.minions.minion.behavior;
 
+import com.eternalcode.minions.event.EventDispatcher;
+import com.eternalcode.minions.event.MinionBlockBreakEvent;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.MinionPosition;
 import com.eternalcode.minions.minion.activity.MinionExecutionPolicy;
@@ -13,12 +15,13 @@ public record MinionContext(
         Minion minion,
         World world,
         ScheduledMinion scheduledMinion,
-        MinionExecutionPolicy policy
+        MinionExecutionPolicy policy,
+        EventDispatcher events
 ) {
 
     public MinionContext {
-        if (minion == null || world == null || scheduledMinion == null || policy == null) {
-            throw new IllegalArgumentException("Minion execution context requires minion, world, schedule and policy");
+        if (minion == null || world == null || scheduledMinion == null || policy == null || events == null) {
+            throw new IllegalArgumentException("Minion execution context requires minion, world, schedule, policy and events");
         }
     }
 
@@ -37,6 +40,10 @@ public record MinionContext(
             chestPosition.blockZ()
         );
         return block.getState(false) instanceof Container container ? container : null;
+    }
+
+    public boolean mayBreak(Block block) {
+        return !this.events.fire(new MinionBlockBreakEvent(this.minion.details(), block)).isCancelled();
     }
 
     public Location location() {

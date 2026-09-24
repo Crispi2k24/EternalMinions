@@ -190,6 +190,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                         new ProximityActivityRule(minionsConfig.activity.proximity)
                 )
         );
+        EventDispatcher events = new EventDispatcher(this.getServer());
         MinionScheduler scheduler = new MinionScheduler(
                 this.getServer(),
                 this.minions,
@@ -198,10 +199,10 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 persistence,
                 statusTracker,
                 this.renderer,
-                activityService
+                activityService,
+                events
         );
         MinionItemFactory minionItems = new MinionItemFactory(this, behaviors, appearance, miniMessage);
-        EventDispatcher events = new EventDispatcher(this.getServer());
         MinionLifecycleService lifecycle = new MinionLifecycleService(
                 this.minions,
                 scheduler,
