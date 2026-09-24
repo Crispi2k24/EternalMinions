@@ -1,11 +1,14 @@
 package com.eternalcode.minions.gui;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MessagesConfig;
 import com.eternalcode.minions.config.MinionPanelAction;
 import com.eternalcode.minions.config.MinionPanelElementConfig;
+import com.eternalcode.minions.event.MinionUpdatedEvent;
 import com.eternalcode.minions.minion.Minion;
+import com.eternalcode.minions.minion.MinionId;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
 import com.eternalcode.minions.minion.MinionEquipment;
@@ -22,22 +25,29 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import com.github.stefvanschie.inventoryframework.pane.util.Slot;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-public final class MinionPanel {
+public final class MinionPanel implements Listener {
 
     private static final int PROGRESS_BAR_SEGMENTS = 10;
+
+    private final Map<UUID, OpenPanel> openPanels = new HashMap<>();
 
     private final Plugin plugin;
     private final MinionPanelConfig config;
@@ -113,6 +123,28 @@ public final class MinionPanel {
         gui.addPane(Slot.fromIndex(0), pane);
         this.populate(gui, pane, layout, player, minion);
         gui.show(player);
+
+        UUID viewerId = player.getUniqueId();
+        OpenPanel openPanel = new OpenPanel(minion.id(), () -> this.access.findAccessible(
+                player,
+                minion.id(),
+                MinionAccessAction.OPEN_PANEL
+        ).ifPresentOrElse(current -> {
+            this.populate(gui, pane, layout, player, current);
+            gui.update();
+        }, player::closeInventory));
+        this.openPanels.put(viewerId, openPanel);
+        gui.setOnClose(event -> this.openPanels.remove(viewerId, openPanel));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMinionUpdated(MinionUpdatedEvent event) {
+        MinionId minionId = event.current().details().id();
+        for (OpenPanel openPanel : List.copyOf(this.openPanels.values())) {
+            if (openPanel.minionId().equals(minionId)) {
+                openPanel.refresh().run();
+            }
+        }
     }
 
     private void populate(
@@ -173,6 +205,10 @@ public final class MinionPanel {
         int storageIndex,
         Consumer<Minion> refresh
     ) {
+        if (element.action == MinionPanelAction.NONE && element.material == XMaterial.AIR) {
+            return storageIndex;
+        }
+
         if (element.action == MinionPanelAction.STORAGE_SLOT) {
             ItemStack stored = storageIndex < minion.storage().capacity() ? minion.storage().item(storageIndex) : null;
             ItemStack icon = stored == null ? this.items.create(element, placeholders) : stored;
@@ -368,5 +404,8 @@ public final class MinionPanel {
 
     private void send(Player player, Notice notice) {
         this.notices.create().viewer(player).notice(notice).send();
+    }
+
+    private record OpenPanel(MinionId minionId, Runnable refresh) {
     }
 }

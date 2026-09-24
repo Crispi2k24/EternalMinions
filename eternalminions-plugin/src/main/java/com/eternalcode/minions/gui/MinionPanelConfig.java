@@ -104,7 +104,10 @@ public final class MinionPanelConfig extends ConfigurationFile {
         return elements;
     }
 
-    @Comment("Every symbol used by pattern must have one complete element definition.")
+    @Comment({
+        "Every symbol used by pattern must have one complete element definition.",
+        "An element with action NONE and material AIR leaves its slots empty."
+    })
     public Map<Character, MinionPanelElementConfig> elements = defaultElements();
 
     private static Map<Character, MinionPanelElementConfig> defaultElements() {

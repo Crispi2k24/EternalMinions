@@ -284,6 +284,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
 
         Stream.of(
                 this.minionAccess,
+                panel,
                 new MinionViewerListener(renders),
                 new MinionPistonProtectionController(this.minions),
                 new MinionBlockProtectionController(this.minions, messages, notices),
