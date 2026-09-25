@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -61,7 +60,7 @@ public final class MinionPanel implements Listener {
     private final MinionAccessGuard access;
     private final MinionItemTransferService transfers;
     private final MinionPickupService pickups;
-    private final BiConsumer<Player, Minion> openUpgrades;
+    private final UpgradesOpener openUpgrades;
     private final BiFunction<Player, Minion, Optional<Minion>> linkChest;
 
     public MinionPanel(
@@ -76,7 +75,7 @@ public final class MinionPanel implements Listener {
         MinionAccessGuard access,
         MinionItemTransferService transfers,
         MinionPickupService pickups,
-        BiConsumer<Player, Minion> openUpgrades,
+        UpgradesOpener openUpgrades,
         BiFunction<Player, Minion, Optional<Minion>> linkChest
     ) {
         this.plugin = plugin;
@@ -238,7 +237,7 @@ public final class MinionPanel implements Listener {
             );
             case UPGRADES -> this.createAccessibleElement(
                     player, minion, MinionAccessAction.OPEN_PANEL, element, placeholders,
-                    current -> this.openUpgrades.accept(player, current)
+                    current -> this.openUpgrades.open(player, current, () -> this.open(player, current))
             );
             case LINK_CHEST -> this.createAccessibleElement(
                     player, minion, MinionAccessAction.MANAGE, element, placeholders,
@@ -429,5 +428,11 @@ public final class MinionPanel implements Listener {
     }
 
     private record OpenPanel(MinionId minionId, Runnable refresh) {
+    }
+
+    @FunctionalInterface
+    public interface UpgradesOpener {
+
+        void open(Player player, Minion minion, Runnable back);
     }
 }

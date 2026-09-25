@@ -1,5 +1,6 @@
 package com.eternalcode.minions.gui;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MinionPanelElementConfig;
@@ -33,6 +34,8 @@ public final class MinionUpgradePanel {
         DefaultUpgradeKinds.CAPACITY, 6
     );
 
+    private static final int BACK_COLUMN = 4;
+
     private final Plugin plugin;
     private final MinionPanelConfig config;
     private final MiniMessage miniMessage;
@@ -58,15 +61,15 @@ public final class MinionUpgradePanel {
         this.items = new PanelItemFactory(miniMessage);
     }
 
-    public void open(Player player, Minion minion) {
+    public void open(Player player, Minion minion, Runnable back) {
         this.access.findAccessible(
                 player,
                 minion.id(),
                 MinionAccessAction.OPEN_PANEL
-        ).ifPresent(current -> this.openAccessible(player, current));
+        ).ifPresent(current -> this.openAccessible(player, current, back));
     }
 
-    private void openAccessible(Player player, Minion minion) {
+    private void openAccessible(Player player, Minion minion, Runnable back) {
         MinionBehavior behavior = this.behaviors.find(minion.behaviorId()).orElse(null);
         if (behavior == null) {
             return;
@@ -83,7 +86,7 @@ public final class MinionUpgradePanel {
 
         StaticPane pane = new StaticPane(9, 3);
         gui.addPane(Slot.fromIndex(0), pane);
-        this.populate(gui, pane, player, behavior, minion);
+        this.populate(gui, pane, player, behavior, minion, back);
         gui.show(player);
     }
 
@@ -92,7 +95,8 @@ public final class MinionUpgradePanel {
         StaticPane pane,
         Player player,
         MinionBehavior behavior,
-        Minion minion
+        Minion minion,
+        Runnable back
     ) {
         pane.clear();
         Runnable refresh = () -> this.access.findAccessible(
@@ -100,7 +104,7 @@ public final class MinionUpgradePanel {
                 minion.id(),
                 MinionAccessAction.OPEN_PANEL
         ).ifPresent(current -> {
-            this.populate(gui, pane, player, behavior, current);
+            this.populate(gui, pane, player, behavior, current, back);
             gui.update();
         });
 
@@ -122,6 +126,14 @@ public final class MinionUpgradePanel {
                 this.plugin
             );
             pane.addItem(item, column, 1);
+        }
+
+        if (this.config.upgradesBack.material != XMaterial.AIR) {
+            pane.addItem(new GuiItem(
+                this.items.create(this.config.upgradesBack, Map.of()),
+                event -> back.run(),
+                this.plugin
+            ), BACK_COLUMN, 2);
         }
     }
 

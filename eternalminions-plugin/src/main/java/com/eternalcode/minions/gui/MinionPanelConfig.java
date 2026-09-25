@@ -67,6 +67,17 @@ public final class MinionPanelConfig extends ConfigurationFile {
         "<green>Click to upgrade."
     );
 
+    @Comment({
+        "Button in the upgrades panel that returns to the minion panel.",
+        "Material AIR hides it."
+    })
+    public MinionPanelElementConfig upgradesBack = element(
+        MinionPanelAction.NONE,
+        XMaterial.ARROW,
+        "<yellow>Back",
+        "<gray>Return to the minion panel."
+    );
+
     @Comment("Lore appended to an upgrade icon that reached its maximum tier.")
     public List<String> upgradeMaximumLore = List.of(
         "<red>This upgrade is already at its maximum."
