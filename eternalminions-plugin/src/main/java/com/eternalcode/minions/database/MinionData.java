@@ -31,6 +31,7 @@ public record MinionData(
         byte[] serializedTool,
         int toolDamage,
         byte[] serializedFuel,
+        int fuelTicksLeft,
         byte[] serializedFirstModule,
         byte[] serializedSecondModule,
         List<StoredItemData> storageItems,
@@ -55,6 +56,9 @@ public record MinionData(
         }
         if (progress < 0L) {
             throw new IllegalArgumentException("Minion progress cannot be negative");
+        }
+        if (fuelTicksLeft < 0) {
+            throw new IllegalArgumentException("Fuel ticks cannot be negative");
         }
         if (toolDamage < -1) {
             throw new IllegalArgumentException("Tool damage cannot be lower than -1");
@@ -89,7 +93,7 @@ public record MinionData(
     ) {
         this(
                 id, ownerId, behaviorId, worldKey, blockX, blockY, blockZ, level, progress,
-                serializedTool, -1, new byte[0], new byte[0], new byte[0],
+                serializedTool, -1, new byte[0], 0, new byte[0], new byte[0],
                 storageItems, upgrades, chestPosition, settings, System.currentTimeMillis()
         );
     }
@@ -119,6 +123,7 @@ public record MinionData(
                 position.blockX(), position.blockY(), position.blockZ(), minion.progress().level(),
                 minion.progress().progress(), ItemDataCodec.encode(minion.equipment().tool()), -1,
                 ItemDataCodec.encode(minion.equipment().fuel()),
+                minion.equipment().fuelTicksLeft(),
                 ItemDataCodec.encode(minion.equipment().firstModule()),
                 ItemDataCodec.encode(minion.equipment().secondModule()), storageItems,
                 upgrades, chestPosition, minion.settings(), System.currentTimeMillis()
@@ -183,7 +188,7 @@ public record MinionData(
                         ItemDataCodec.decode(this.serializedFuel),
                         ItemDataCodec.decode(this.serializedFirstModule),
                         ItemDataCodec.decode(this.serializedSecondModule)
-                ), storage, minionUpgrades,
+                ).withFuelTicksLeft(this.fuelTicksLeft), storage, minionUpgrades,
                 this.chestPosition == null ? null : new MinionPosition(
                         this.chestPosition.worldKey(),
                         this.chestPosition.blockX(),

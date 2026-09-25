@@ -1,5 +1,6 @@
 package com.eternalcode.minions.minion;
 
+import com.eternalcode.minions.addon.MinionAnchorTickets;
 import com.eternalcode.minions.event.MinionCreatedEvent;
 import com.eternalcode.minions.event.MinionEventCause;
 import com.eternalcode.minions.event.EventDispatcher;
@@ -29,6 +30,7 @@ public final class MinionLifecycleService {
     private final MinionBehaviorRegistry behaviors;
     private final MinionStatusTracker statuses;
     private final EventDispatcher events;
+    private final MinionAnchorTickets anchors;
 
     public MinionLifecycleService(
         MinionRegistry minions,
@@ -37,7 +39,8 @@ public final class MinionLifecycleService {
         MinionPersistenceService persistence,
         MinionBehaviorRegistry behaviors,
         MinionStatusTracker statuses,
-        EventDispatcher events
+        EventDispatcher events,
+        MinionAnchorTickets anchors
     ) {
         this.minions = minions;
         this.scheduler = scheduler;
@@ -46,6 +49,7 @@ public final class MinionLifecycleService {
         this.behaviors = behaviors;
         this.statuses = statuses;
         this.events = events;
+        this.anchors = anchors;
     }
 
     public int restoreAll(List<MinionData> loaded) {
@@ -58,6 +62,7 @@ public final class MinionLifecycleService {
             this.minions.register(minion);
             this.scheduler.add(minion);
             this.renders.showToNearby(minion);
+            this.anchors.update(minion);
             this.events.fire(new MinionCreatedEvent(
                 this.snapshot(minion),
                 MinionEventCause.RESTORE,
@@ -80,6 +85,7 @@ public final class MinionLifecycleService {
         this.minions.register(minion);
         this.scheduler.add(minion);
         this.renders.showToNearby(minion);
+        this.anchors.update(minion);
         this.persistence.create(minion);
         this.events.fire(new MinionCreatedEvent(this.snapshot(minion), cause, actorId));
         return true;
@@ -107,6 +113,7 @@ public final class MinionLifecycleService {
         }
 
         this.scheduler.remove(minion);
+        this.anchors.release(minionId);
         this.renders.remove(minion);
         this.statuses.clearStatus(minionId);
         afterRemoval.accept(minion);
@@ -129,6 +136,7 @@ public final class MinionLifecycleService {
         Minion previous = this.minions.replace(minion);
         this.persistence.saveEquipment(minion);
         this.renders.refreshEquipment(minion);
+        this.anchors.update(minion);
         this.fireUpdate(previous, minion, MinionUpdateType.TOOL, cause, actorId);
     }
 

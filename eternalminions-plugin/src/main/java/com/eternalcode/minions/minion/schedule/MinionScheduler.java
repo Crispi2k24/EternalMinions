@@ -1,5 +1,7 @@
 package com.eternalcode.minions.minion.schedule;
 
+import com.eternalcode.minions.addon.MinionAnchorTickets;
+import com.eternalcode.minions.addon.MinionFuelService;
 import com.eternalcode.minions.config.MinionsConfig;
 import com.eternalcode.minions.database.MinionPersistenceService;
 import com.eternalcode.minions.event.EventDispatcher;
@@ -11,6 +13,7 @@ import com.eternalcode.minions.minion.behavior.MinionBehavior;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
 import com.eternalcode.minions.minion.behavior.MinionContext;
 import com.eternalcode.minions.minion.behavior.MinionResult;
+import com.eternalcode.minions.minion.status.CoreMinionStatuses;
 import com.eternalcode.minions.minion.status.MinionStatus;
 import com.eternalcode.minions.minion.status.MinionStatusTracker;
 import com.eternalcode.minions.render.MinionRenderer;
@@ -33,6 +36,8 @@ public final class MinionScheduler implements Runnable {
     private final MinionRenderer renderer;
     private final MinionActivityService activityService;
     private final EventDispatcher events;
+    private final MinionFuelService fuels;
+    private final MinionAnchorTickets anchors;
     private final MinionSchedule minionSchedule = new MinionSchedule(128);
     private long currentTick;
 
@@ -45,7 +50,9 @@ public final class MinionScheduler implements Runnable {
             MinionStatusTracker statusTracker,
             MinionRenderer renderer,
             MinionActivityService activityService,
-            EventDispatcher events
+            EventDispatcher events,
+            MinionFuelService fuels,
+            MinionAnchorTickets anchors
     ) {
         this.server = server;
         this.minionRegistry = minionRegistry;
@@ -56,6 +63,8 @@ public final class MinionScheduler implements Runnable {
         this.renderer = renderer;
         this.activityService = activityService;
         this.events = events;
+        this.fuels = fuels;
+        this.anchors = anchors;
     }
 
     public void add(Minion minion) {
@@ -106,6 +115,10 @@ public final class MinionScheduler implements Runnable {
         }
 
         ActivityDecision decision = this.activityService.evaluate(minion, world);
+        boolean away = decision.frozen() && isAbsence(decision.statusOverride()) && this.fuels.anchors(minion);
+        if (away) {
+            decision = new ActivityDecision(false, this.fuels.awaySpeed(minion), false, null);
+        }
         if (decision.frozen()) {
             this.applyStatusOnly(minion, decision.statusOverride());
             return behavior.idleInterval();
@@ -122,16 +135,30 @@ public final class MinionScheduler implements Runnable {
             result = new MinionResult(result.minion(), decision.statusOverride(), result.worked(), result.delayTicks());
         }
 
-        this.applyResult(minion, result, scheduledMinion);
-
         long baseDelay = result.delayTicks() != null
                 ? result.delayTicks()
                 : result.worked() ? behavior.workInterval(result.minion()) : behavior.idleInterval();
+        long delay = decision.speedMultiplier() < 1.0D
+                ? Math.max(1L, Math.round(baseDelay / decision.speedMultiplier()))
+                : baseDelay;
 
-        if (decision.speedMultiplier() < 1.0D) {
-            return Math.max(1L, Math.round(baseDelay / decision.speedMultiplier()));
+        if (result.worked()) {
+            delay = this.fuels.accelerate(minion, world, delay, away);
+            result = new MinionResult(
+                    this.fuels.afterWork(minion, result.minion(), behavior.config(), delay, away),
+                    result.status(),
+                    result.worked(),
+                    result.delayTicks()
+            );
         }
-        return baseDelay;
+
+        this.applyResult(minion, result, scheduledMinion);
+        this.anchors.update(result.minion());
+        return delay;
+    }
+
+    private static boolean isAbsence(MinionStatus status) {
+        return CoreMinionStatuses.OFFLINE.equals(status) || CoreMinionStatuses.AWAY.equals(status);
     }
 
     private void applyStatusOnly(Minion minion, MinionStatus status) {

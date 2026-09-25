@@ -19,14 +19,20 @@ public final class MinionAddonConfig extends ConfigurationFile {
         "Items accepted by the fuel slot of the minion panel, keyed by id.",
         "Ids must be unique across fuels and modules."
     })
-    public Map<String, MinionAddonItemConfig> fuels = defaultFuels();
+    public Map<String, MinionFuelConfig> fuels = defaultFuels();
 
     @Comment("Items accepted by the two module slots of the minion panel, keyed by id.")
     public Map<String, MinionAddonItemConfig> modules = defaultModules();
 
     public Optional<MinionAddonItemConfig> find(MinionAddon addon) {
-        Map<String, MinionAddonItemConfig> definitions = addon.type() == MinionAddonType.FUEL ? this.fuels : this.modules;
-        return Optional.ofNullable(definitions.get(addon.id()));
+        if (addon.type() == MinionAddonType.FUEL) {
+            return this.fuel(addon.id()).map(fuel -> fuel.item);
+        }
+        return Optional.ofNullable(this.modules.get(addon.id()));
+    }
+
+    public Optional<MinionFuelConfig> fuel(String id) {
+        return Optional.ofNullable(this.fuels.get(id));
     }
 
     public Optional<MinionAddon> find(String id) {
@@ -39,30 +45,38 @@ public final class MinionAddonConfig extends ConfigurationFile {
         return Optional.empty();
     }
 
-    private static Map<String, MinionAddonItemConfig> defaultFuels() {
-        Map<String, MinionAddonItemConfig> fuels = new LinkedHashMap<>();
-        fuels.put("wegielek", fuel(XMaterial.COAL_BLOCK, false, "<green>Węgielek minionka",
+    private static Map<String, MinionFuelConfig> defaultFuels() {
+        Map<String, MinionFuelConfig> fuels = new LinkedHashMap<>();
+        fuels.put("wegielek", MinionFuelConfig.of(fuel(XMaterial.COAL_BLOCK, false, "<green>Węgielek minionka",
             "<gray>Pracuje szybciej o <aqua>10%<gray>.",
-            "<gray>Starcza na <aqua>1 h <gray>pracy."));
-        fuels.put("zapalnik", fuel(XMaterial.BLAZE_POWDER, false, "<green>Zapalnik",
+            "<gray>Starcza na <aqua>1 h <gray>pracy."), 10, 60));
+        fuels.put("zapalnik", MinionFuelConfig.of(fuel(XMaterial.BLAZE_POWDER, false, "<green>Zapalnik",
             "<gray>Pracuje szybciej o <aqua>25%<gray>.",
-            "<gray>Starcza na <aqua>6 h <gray>pracy."));
-        fuels.put("serce_magmy", fuel(XMaterial.MAGMA_CREAM, false, "<green>Serce magmy",
+            "<gray>Starcza na <aqua>6 h <gray>pracy."), 25, 360));
+        fuels.put("serce_magmy", MinionFuelConfig.of(fuel(XMaterial.MAGMA_CREAM, false, "<green>Serce magmy",
             "<gray>Pracuje szybciej o <aqua>50%<gray>.",
-            "<gray>Starcza na <aqua>24 h <gray>pracy."));
-        fuels.put("panel_sloneczny", fuel(XMaterial.DAYLIGHT_DETECTOR, false, "<green>Panel słoneczny",
+            "<gray>Starcza na <aqua>24 h <gray>pracy."), 50, 1440));
+        MinionFuelConfig solarPanel = MinionFuelConfig.of(fuel(XMaterial.DAYLIGHT_DETECTOR, false,
+            "<green>Panel słoneczny",
             "<gray>W dzień pracuje szybciej o <aqua>15%<gray>.",
-            "<gray>Nie zużywa się."));
-        fuels.put("zwoj_nauki", fuel(XMaterial.PAPER, true, "<green>Zwój nauki",
+            "<gray>Nie zużywa się."), 15, 0);
+        solarPanel.daylightOnly = true;
+        fuels.put("panel_sloneczny", solarPanel);
+        MinionFuelConfig scroll = MinionFuelConfig.of(fuel(XMaterial.PAPER, true, "<green>Zwój nauki",
             "<gray>Poziom minionka rośnie <aqua>2x <gray>szybciej.",
-            "<gray>Starcza na <aqua>6 h <gray>pracy."));
-        fuels.put("katalizator", fuel(XMaterial.END_CRYSTAL, true, "<green>Katalizator",
+            "<gray>Starcza na <aqua>6 h <gray>pracy."), 0, 360);
+        scroll.progressMultiplier = 2.0D;
+        fuels.put("zwoj_nauki", scroll);
+        fuels.put("katalizator", MinionFuelConfig.of(fuel(XMaterial.END_CRYSTAL, true, "<green>Katalizator",
             "<gray>Pracuje <aqua>2x <gray>szybciej.",
-            "<gray>Starcza na <aqua>1 h <gray>pracy."));
-        fuels.put("kotwica", fuel(XMaterial.RESPAWN_ANCHOR, false, "<green>Kotwica",
+            "<gray>Starcza na <aqua>1 h <gray>pracy."), 100, 60));
+        MinionFuelConfig anchor = MinionFuelConfig.of(fuel(XMaterial.RESPAWN_ANCHOR, false, "<green>Kotwica",
             "<gray>Pracuje dalej, gdy jesteś offline",
             "<gray>albo daleko, na <aqua>25% <gray>prędkości.",
-            "<gray>Starcza na <aqua>24 h <gray>pracy."));
+            "<gray>Starcza na <aqua>24 h <gray>takiej pracy."), 0, 1440);
+        anchor.worksWhileAway = true;
+        anchor.awaySpeedPercent = 25;
+        fuels.put("kotwica", anchor);
         return fuels;
     }
 

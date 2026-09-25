@@ -40,6 +40,7 @@ public final class MinionItemFactory {
     private final NamespacedKey progressKey;
     private final NamespacedKey toolKey;
     private final NamespacedKey fuelKey;
+    private final NamespacedKey fuelTicksKey;
     private final NamespacedKey firstModuleKey;
     private final NamespacedKey secondModuleKey;
     private final NamespacedKey storageKey;
@@ -60,6 +61,7 @@ public final class MinionItemFactory {
         this.progressKey = new NamespacedKey(plugin, "minion_progress");
         this.toolKey = new NamespacedKey(plugin, "minion_tool");
         this.fuelKey = new NamespacedKey(plugin, "minion_fuel");
+        this.fuelTicksKey = new NamespacedKey(plugin, "minion_fuel_ticks");
         this.firstModuleKey = new NamespacedKey(plugin, "minion_first_module");
         this.secondModuleKey = new NamespacedKey(plugin, "minion_second_module");
         this.storageKey = new NamespacedKey(plugin, "minion_storage");
@@ -103,6 +105,7 @@ public final class MinionItemFactory {
         data.set(this.progressKey, PersistentDataType.LONG, minion.progress().progress());
         data.set(this.toolKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().tool()));
         data.set(this.fuelKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().fuel()));
+        data.set(this.fuelTicksKey, PersistentDataType.INTEGER, minion.equipment().fuelTicksLeft());
         data.set(this.firstModuleKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().firstModule()));
         data.set(this.secondModuleKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().secondModule()));
         data.set(this.storageKey, PersistentDataType.BYTE_ARRAY, encodeStorage(minion.storage()));
@@ -219,12 +222,13 @@ public final class MinionItemFactory {
         long progress = data.getOrDefault(this.progressKey, PersistentDataType.LONG, 0L);
         byte[] toolData = data.getOrDefault(this.toolKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         byte[] fuelData = data.getOrDefault(this.fuelKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
+        int fuelTicks = data.getOrDefault(this.fuelTicksKey, PersistentDataType.INTEGER, 0);
         byte[] firstModuleData = data.getOrDefault(this.firstModuleKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         byte[] secondModuleData = data.getOrDefault(this.secondModuleKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         byte[] storageData = data.getOrDefault(this.storageKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         String upgradesData = data.getOrDefault(this.upgradesKey, PersistentDataType.STRING, "");
         return Optional.of(new StoredMinionState(
-            behaviorId, level, progress, decodeItem(toolData), decodeItem(fuelData),
+            behaviorId, level, progress, decodeItem(toolData), decodeItem(fuelData), fuelTicks,
             decodeItem(firstModuleData), decodeItem(secondModuleData), decodeStorage(storageData),
             decodeUpgrades(upgradesData)));
     }
@@ -235,6 +239,7 @@ public final class MinionItemFactory {
         long progress,
         ItemStack tool,
         ItemStack fuel,
+        int fuelTicksLeft,
         ItemStack firstModule,
         ItemStack secondModule,
         ItemStack[] storage,

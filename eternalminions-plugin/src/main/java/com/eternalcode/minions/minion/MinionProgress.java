@@ -18,7 +18,15 @@ public record MinionProgress(int level, long progress) {
     }
 
     public MinionProgress advanced(AbstractMinionConfig config) {
-        long updatedProgress = this.progress + 1;
+        return this.advancedBy(config, 1L);
+    }
+
+    public MinionProgress advancedBy(AbstractMinionConfig config, long actions) {
+        if (actions <= 0L) {
+            return this;
+        }
+
+        long updatedProgress = this.progress + actions;
         int updatedLevel = this.level;
         while (updatedLevel < config.maxLevel() && updatedProgress >= config.progressToReach(updatedLevel + 1)) {
             updatedLevel++;

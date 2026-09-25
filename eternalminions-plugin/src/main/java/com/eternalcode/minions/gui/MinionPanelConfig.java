@@ -47,6 +47,15 @@ public final class MinionPanelConfig extends ConfigurationFile {
     public String directionNorth = "North";
     public String directionEast = "East";
 
+    @Comment({
+        "Texts used by the {MINION_FUEL_TIME} placeholder - the working time left in the fuel slot.",
+        "Placeholders: {HOURS}, {MINUTES}, {TOTAL_MINUTES}."
+    })
+    public String fuelNoneText = "none";
+    public String fuelUnlimitedText = "unlimited";
+    public String fuelMinutesFormat = "{TOTAL_MINUTES} min";
+    public String fuelHoursFormat = "{HOURS} h {MINUTES} min";
+
     @Comment("Title of the upgrades panel. Supports MiniMessage and minion placeholders.")
     public String upgradesTitle = "<dark_gray>Minion Upgrades";
 

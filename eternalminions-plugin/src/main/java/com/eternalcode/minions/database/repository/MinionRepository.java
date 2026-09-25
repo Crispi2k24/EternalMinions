@@ -1,6 +1,7 @@
 package com.eternalcode.minions.database.repository;
 
 import com.eternalcode.minions.database.DatabaseManager;
+import com.eternalcode.minions.database.ItemDataCodec;
 import com.eternalcode.minions.database.MinionData;
 import com.eternalcode.minions.database.MinionEquipmentSlot;
 import com.eternalcode.minions.database.StoredItemData;
@@ -142,6 +143,10 @@ public final class MinionRepository extends AbstractRepositoryOrmLite {
     private void insertEquipment(MinionData minion) throws Exception {
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.TOOL, minion.serializedTool());
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.FUEL, minion.serializedFuel());
+        if (minion.fuelTicksLeft() > 0) {
+            this.insertEquipmentSlot(
+                    minion.id(), MinionEquipmentSlot.FUEL_TICKS, ItemDataCodec.encodeInteger(minion.fuelTicksLeft()));
+        }
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.FIRST_MODULE, minion.serializedFirstModule());
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.SECOND_MODULE, minion.serializedSecondModule());
     }

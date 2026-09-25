@@ -3,6 +3,7 @@ package com.eternalcode.minions.gui;
 import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.addon.MinionAddonType;
+import com.eternalcode.minions.addon.MinionFuelService;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MessagesConfig;
@@ -64,6 +65,7 @@ public final class MinionPanel implements Listener {
     private final MinionItemTransferService transfers;
     private final MinionPickupService pickups;
     private final MinionAddonItems addons;
+    private final MinionFuelService fuels;
     private final UpgradesOpener openUpgrades;
     private final BiFunction<Player, Minion, Optional<Minion>> linkChest;
 
@@ -80,6 +82,7 @@ public final class MinionPanel implements Listener {
         MinionItemTransferService transfers,
         MinionPickupService pickups,
         MinionAddonItems addons,
+        MinionFuelService fuels,
         UpgradesOpener openUpgrades,
         BiFunction<Player, Minion, Optional<Minion>> linkChest
     ) {
@@ -96,6 +99,7 @@ public final class MinionPanel implements Listener {
         this.transfers = transfers;
         this.pickups = pickups;
         this.addons = addons;
+        this.fuels = fuels;
         this.openUpgrades = openUpgrades;
         this.linkChest = linkChest;
     }
@@ -341,11 +345,13 @@ public final class MinionPanel implements Listener {
             return;
         }
 
-        ItemStack previous = slot.apply(minion.equipment());
-        if (emptyCursor && previous == null) {
+        if (emptyCursor && slot.apply(minion.equipment()) == null) {
             return;
         }
 
+        ItemStack previous = type == MinionAddonType.FUEL
+                ? this.fuels.withoutBurningUnit(minion.equipment())
+                : slot.apply(minion.equipment());
         Minion updated = minion.withEquipment(replace.apply(minion.equipment(), emptyCursor ? null : cursor));
         this.lifecycle.updateEquipment(updated);
         player.setItemOnCursor(previous);
@@ -441,7 +447,24 @@ public final class MinionPanel implements Listener {
         });
         placeholders.put("{STORAGE_USED}", Integer.toString(this.countStoredItems(minion)));
         placeholders.put("{STORAGE_CAPACITY}", Integer.toString(minion.storage().capacity()));
+        placeholders.put("{MINION_FUEL_TIME}", this.formatFuelTime(this.fuels.remainingTicks(minion)));
         return placeholders;
+    }
+
+    private String formatFuelTime(long ticks) {
+        if (ticks <= 0L) {
+            return this.config.fuelNoneText;
+        }
+        if (ticks == Long.MAX_VALUE) {
+            return this.config.fuelUnlimitedText;
+        }
+
+        long minutes = Math.ceilDiv(ticks, MinionFuelService.TICKS_PER_MINUTE);
+        String format = minutes < 60L ? this.config.fuelMinutesFormat : this.config.fuelHoursFormat;
+        return format
+            .replace("{HOURS}", Long.toString(minutes / 60L))
+            .replace("{MINUTES}", Long.toString(minutes % 60L))
+            .replace("{TOTAL_MINUTES}", Long.toString(minutes));
     }
 
     private String createProgressBar(Minion minion, MinionBehavior behavior, int level) {

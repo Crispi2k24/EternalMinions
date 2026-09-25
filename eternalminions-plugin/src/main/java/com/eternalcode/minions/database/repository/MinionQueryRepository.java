@@ -260,6 +260,7 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
                 equipment.tools().getOrDefault(minion.id(), new byte[0]),
                 equipment.toolDamage().getOrDefault(minion.id(), -1),
                 equipment.addon(minion.id(), MinionEquipmentSlot.FUEL),
+                equipment.fuelTicks(minion.id()),
                 equipment.addon(minion.id(), MinionEquipmentSlot.FIRST_MODULE),
                 equipment.addon(minion.id(), MinionEquipmentSlot.SECOND_MODULE),
                 storage.getOrDefault(minion.id(), List.of()),
@@ -287,6 +288,11 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
             Map<Long, Integer> toolDamage,
             Map<Long, Map<String, byte[]>> addons
     ) {
+
+        private int fuelTicks(long minionId) {
+            byte[] serializedTicks = this.addon(minionId, MinionEquipmentSlot.FUEL_TICKS);
+            return serializedTicks.length == 0 ? 0 : ItemDataCodec.decodeInteger(serializedTicks);
+        }
 
         private byte[] addon(long minionId, MinionEquipmentSlot slot) {
             return this.addons.getOrDefault(minionId, Map.of()).getOrDefault(slot.name(), new byte[0]);

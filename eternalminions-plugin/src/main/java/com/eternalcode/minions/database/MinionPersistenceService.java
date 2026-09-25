@@ -5,6 +5,7 @@ import com.eternalcode.minions.database.repository.MinionActionRepository;
 import com.eternalcode.minions.database.repository.MinionRepository;
 import com.eternalcode.minions.database.repository.MinionStateRepository;
 import com.eternalcode.minions.minion.Minion;
+import com.eternalcode.minions.minion.MinionEquipment;
 import com.eternalcode.minions.minion.MinionId;
 import com.eternalcode.minions.minion.MinionPosition;
 import com.eternalcode.minions.minion.storage.MinionChestLinkRepository;
@@ -20,6 +21,8 @@ import java.util.logging.Logger;
 import org.bukkit.inventory.ItemStack;
 
 public final class MinionPersistenceService {
+
+    private static final int TICKS_PER_MINUTE = 1_200;
 
     private final Logger logger;
     private final MinionRepository minions;
@@ -148,10 +151,18 @@ public final class MinionPersistenceService {
                         this.saveEquipmentSlot(
                                 minion, MinionEquipmentSlot.FIRST_MODULE, minion.equipment().firstModule()),
                         this.saveEquipmentSlot(
-                                minion, MinionEquipmentSlot.SECOND_MODULE, minion.equipment().secondModule())
+                                minion, MinionEquipmentSlot.SECOND_MODULE, minion.equipment().secondModule()),
+                        this.saveFuelTicks(minion)
                 ),
                 "save equipment for minion " + minion.id().value()
         );
+    }
+
+    private CompletableFuture<Void> saveFuelTicks(Minion minion) {
+        int ticks = minion.equipment().fuelTicksLeft();
+        return ticks > 0
+                ? this.equipment.saveSlot(minion.id(), MinionEquipmentSlot.FUEL_TICKS, ItemDataCodec.encodeInteger(ticks))
+                : this.equipment.deleteSlot(minion.id(), MinionEquipmentSlot.FUEL_TICKS);
     }
 
     private CompletableFuture<Void> saveEquipmentSlot(Minion minion, MinionEquipmentSlot slot, ItemStack item) {
@@ -241,54 +252,67 @@ public final class MinionPersistenceService {
     }
 
     private List<MinionActionUpdate.EquipmentChange> equipmentChanges(Minion previous, Minion updated) {
-        if (previous.equipment() == updated.equipment()) {
+        MinionEquipment before = previous.equipment();
+        MinionEquipment after = updated.equipment();
+        if (before == after) {
             return List.of();
-        }
-        if (updated.equipment().hasAddonChangeSince(previous.equipment())) {
-            return List.of(
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.TOOL,
-                            ItemDataCodec.encode(updated.equipment().tool())
-                    ),
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.TOOL_DAMAGE,
-                            new byte[0]
-                    ),
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.FUEL,
-                            ItemDataCodec.encode(updated.equipment().fuel())
-                    ),
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.FIRST_MODULE,
-                            ItemDataCodec.encode(updated.equipment().firstModule())
-                    ),
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.SECOND_MODULE,
-                            ItemDataCodec.encode(updated.equipment().secondModule())
-                    )
-            );
-        }
-        if (updated.equipment().hasVisualChangeSince(previous.equipment())) {
-            return List.of(
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.TOOL,
-                            ItemDataCodec.encode(updated.equipment().tool())
-                    ),
-                    new MinionActionUpdate.EquipmentChange(
-                            MinionEquipmentSlot.TOOL_DAMAGE,
-                            new byte[0]
-                    )
-            );
         }
 
-        int damage = updated.equipment().toolDamage();
-        if (damage < 0) {
-            return List.of();
+        List<MinionActionUpdate.EquipmentChange> changes = new ArrayList<>();
+        if (after.hasAddonChangeSince(before)) {
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.FUEL,
+                    ItemDataCodec.encode(after.fuel())
+            ));
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.FIRST_MODULE,
+                    ItemDataCodec.encode(after.firstModule())
+            ));
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.SECOND_MODULE,
+                    ItemDataCodec.encode(after.secondModule())
+            ));
+            changes.add(fuelTicksChange(after));
         }
-        return List.of(new MinionActionUpdate.EquipmentChange(
-                MinionEquipmentSlot.TOOL_DAMAGE,
-                ItemDataCodec.encodeInteger(damage)
-        ));
+        else if (fuelTicksNeedSaving(before, after)) {
+            changes.add(fuelTicksChange(after));
+        }
+
+        if (after.hasVisualChangeSince(before)) {
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.TOOL,
+                    ItemDataCodec.encode(after.tool())
+            ));
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.TOOL_DAMAGE,
+                    new byte[0]
+            ));
+            return changes;
+        }
+
+        int damage = after.toolDamage();
+        if (damage >= 0 && damage != before.toolDamage()) {
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.TOOL_DAMAGE,
+                    ItemDataCodec.encodeInteger(damage)
+            ));
+        }
+        return changes;
+    }
+
+    private static boolean fuelTicksNeedSaving(MinionEquipment before, MinionEquipment after) {
+        int ticksBefore = before.fuelTicksLeft();
+        int ticksAfter = after.fuelTicksLeft();
+        return ticksBefore != ticksAfter
+                && (ticksAfter == 0 || ticksBefore / TICKS_PER_MINUTE != ticksAfter / TICKS_PER_MINUTE);
+    }
+
+    private static MinionActionUpdate.EquipmentChange fuelTicksChange(MinionEquipment equipment) {
+        int ticks = equipment.fuelTicksLeft();
+        return new MinionActionUpdate.EquipmentChange(
+                MinionEquipmentSlot.FUEL_TICKS,
+                ticks > 0 ? ItemDataCodec.encodeInteger(ticks) : new byte[0]
+        );
     }
 
     private List<MinionActionUpdate.StorageChange> storageChanges(Minion previous, Minion updated) {

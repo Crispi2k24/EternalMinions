@@ -2,6 +2,8 @@ package com.eternalcode.minions;
 
 import com.eternalcode.minions.addon.MinionAddonConfig;
 import com.eternalcode.minions.addon.MinionAddonItems;
+import com.eternalcode.minions.addon.MinionAnchorTickets;
+import com.eternalcode.minions.addon.MinionFuelService;
 import com.eternalcode.minions.bridge.BridgeManager;
 import com.eternalcode.minions.bridge.economy.MinionEconomyServiceImpl;
 import com.eternalcode.minions.bridge.shop.MinionShopServiceImpl;
@@ -196,6 +198,10 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                         new ProximityActivityRule(minionsConfig.activity.proximity)
                 )
         );
+        MinionAddonConfig addonConfig = configs.get(MinionAddonConfig.class);
+        MinionAddonItems addonItems = new MinionAddonItems(this, addonConfig, appearance, miniMessage);
+        MinionFuelService fuels = new MinionFuelService(addonConfig, addonItems);
+        MinionAnchorTickets anchors = new MinionAnchorTickets(this, fuels);
         EventDispatcher events = new EventDispatcher(this.getServer());
         MinionScheduler scheduler = new MinionScheduler(
                 this.getServer(),
@@ -206,11 +212,11 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 statusTracker,
                 this.renderer,
                 activityService,
-                events
+                events,
+                fuels,
+                anchors
         );
         MinionItemFactory minionItems = new MinionItemFactory(this, behaviors, appearance, miniMessage);
-        MinionAddonItems addonItems = new MinionAddonItems(
-                this, configs.get(MinionAddonConfig.class), appearance, miniMessage);
         MinionLifecycleService lifecycle = new MinionLifecycleService(
                 this.minions,
                 scheduler,
@@ -218,7 +224,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 persistence,
                 behaviors,
                 statusTracker,
-                events
+                events,
+                anchors
         );
         MinionServiceImpl queryApi = new MinionServiceImpl(this.minions, statusTracker);
         MinionManagement managementApi = new MinionManagement(
@@ -286,6 +293,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 itemTransfers,
                 pickups,
                 addonItems,
+                fuels,
                 upgradePanel::open,
                 chestLinks::toggle
         );
