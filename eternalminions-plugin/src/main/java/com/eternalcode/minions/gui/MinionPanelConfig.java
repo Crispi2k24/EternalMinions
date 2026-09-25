@@ -110,6 +110,17 @@ public final class MinionPanelConfig extends ConfigurationFile {
     })
     public Map<Character, MinionPanelElementConfig> elements = defaultElements();
 
+    @Comment({
+        "Icon of storage slots above the minion's current capacity.",
+        "Material AIR leaves them empty."
+    })
+    public MinionPanelElementConfig lockedStorageSlot = element(
+        MinionPanelAction.NONE,
+        XMaterial.GRAY_STAINED_GLASS_PANE,
+        "<red>Locked storage slot",
+        "<gray>Unlock more slots with the capacity upgrade."
+    );
+
     private static Map<Character, MinionPanelElementConfig> defaultElements() {
         Map<Character, MinionPanelElementConfig> elements = new LinkedHashMap<>();
         elements.put('#', element(MinionPanelAction.NONE, XMaterial.BLACK_STAINED_GLASS_PANE, " "));

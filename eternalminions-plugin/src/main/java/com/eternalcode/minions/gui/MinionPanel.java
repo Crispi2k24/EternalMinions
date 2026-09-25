@@ -210,9 +210,18 @@ public final class MinionPanel implements Listener {
         }
 
         if (element.action == MinionPanelAction.STORAGE_SLOT) {
-            ItemStack stored = storageIndex < minion.storage().capacity() ? minion.storage().item(storageIndex) : null;
-            ItemStack icon = stored == null ? this.items.create(element, placeholders) : stored;
-            pane.addItem(new GuiItem(icon, this.plugin), column, row);
+            if (storageIndex >= minion.storage().capacity()) {
+                this.addIcon(pane, column, row, this.config.lockedStorageSlot, placeholders);
+                return storageIndex + 1;
+            }
+
+            ItemStack stored = minion.storage().item(storageIndex);
+            if (stored == null) {
+                this.addIcon(pane, column, row, element, placeholders);
+            }
+            else {
+                pane.addItem(new GuiItem(stored, this.plugin), column, row);
+            }
             return storageIndex + 1;
         }
 
@@ -248,6 +257,19 @@ public final class MinionPanel implements Listener {
         };
         pane.addItem(item, column, row);
         return storageIndex;
+    }
+
+    private void addIcon(
+        StaticPane pane,
+        int column,
+        int row,
+        MinionPanelElementConfig element,
+        Map<String, String> placeholders
+    ) {
+        if (element.material == XMaterial.AIR) {
+            return;
+        }
+        pane.addItem(new GuiItem(this.items.create(element, placeholders), this.plugin), column, row);
     }
 
     private GuiItem createToolElement(
