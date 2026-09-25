@@ -81,6 +81,10 @@ public final class MinionRenderService {
         this.renderer.refreshEquipment(minion.id(), minion.equipment().tool());
     }
 
+    public void refreshAppearance(Minion minion) {
+        this.renderer.refreshAppearance(minion);
+    }
+
     public void refreshRotation(Minion minion) {
         this.renderer.refreshRotation(minion);
     }

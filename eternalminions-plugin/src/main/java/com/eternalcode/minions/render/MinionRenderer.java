@@ -1,6 +1,7 @@
 package com.eternalcode.minions.render;
 
 import com.eternalcode.minions.addon.MinionSkins;
+import com.eternalcode.minions.item.MinionTrimArmor;
 import com.eternalcode.minions.config.MinionsConfig;
 import com.eternalcode.minions.item.MinionAppearanceItems;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
@@ -26,7 +27,8 @@ public interface MinionRenderer {
         MinionStatusTracker statusTracker,
         MinionEntityIndex entityIndex,
         MinionAppearanceItems appearance,
-        MinionSkins skins
+        MinionSkins skins,
+        MinionTrimArmor trimArmor
     ) {
         EntityLib.init(
                 new SpigotEntityLibPlatform(plugin),
@@ -42,8 +44,8 @@ public interface MinionRenderer {
         );
 
         return switch (config.minionRenderer) {
-            case ARMOR_STAND -> new ArmorStandMinionRenderer(holograms, entityIndex, behaviors, appearance, skins);
-            case NPC -> new NpcMinionRenderer(holograms, entityIndex, behaviors, appearance, skins);
+            case ARMOR_STAND -> new ArmorStandMinionRenderer(holograms, entityIndex, behaviors, appearance, skins, trimArmor);
+            case NPC -> new NpcMinionRenderer(holograms, entityIndex, behaviors, appearance, skins, trimArmor);
         };
     }
 
@@ -56,6 +58,9 @@ public interface MinionRenderer {
     void animate(MinionId minionId, float targetYaw);
 
     default void refreshEquipment(MinionId minionId, ItemStack tool) {
+    }
+
+    default void refreshAppearance(Minion minion) {
     }
 
     default void refreshHologram(Minion minion) {

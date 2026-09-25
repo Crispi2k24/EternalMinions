@@ -181,6 +181,7 @@ public final class MinionLifecycleService {
         this.minions.replace(minion);
         this.persistence.saveUpgrade(minion, upgrade);
         this.persistence.saveStorage(previous, minion);
+        this.renders.refreshAppearance(minion);
         this.fireUpdate(previous, minion, MinionUpdateType.UPGRADE, cause, actorId);
     }
 

@@ -32,6 +32,7 @@ import com.eternalcode.minions.gui.MinionSkinPanel;
 import com.eternalcode.minions.gui.MinionUpgradePanel;
 import com.eternalcode.minions.item.MinionAppearanceItems;
 import com.eternalcode.minions.item.MinionItemFactory;
+import com.eternalcode.minions.item.MinionTrimArmor;
 import com.eternalcode.minions.item.MinionItemServiceImpl;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.schedule.MinionScheduler;
@@ -147,6 +148,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         MinionFuelService fuels = new MinionFuelService(addonConfig, addonItems);
         MinionAnchorTickets anchors = new MinionAnchorTickets(this, fuels);
         MinionSkins skins = new MinionSkins(configs.get(MinionSkinsConfig.class));
+        MinionTrimArmor trimArmor = new MinionTrimArmor(minionsConfig, skins);
         KillerLootingListener killerLooting = new KillerLootingListener();
         SellerConfig sellerConfig = configs.get(SellerConfig.class);
 
@@ -196,7 +198,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 statusTracker,
                 entityIndex,
                 appearance,
-                skins
+                skins,
+                trimArmor
         );
         MinionRenderService renders =
                 new MinionRenderService(this.getServer(), this.minions, this.renderer, minionsConfig);

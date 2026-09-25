@@ -8,6 +8,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
+import me.tofaa.entitylib.wrapper.WrapperEntityEquipment;
 import me.tofaa.entitylib.wrapper.WrapperLivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -92,6 +93,17 @@ abstract class AbstractEntityLibMinionRenderer implements MinionRenderer {
     }
 
     @Override
+    public final void refreshAppearance(Minion minion) {
+        RenderedMinion view = this.rendered.get(minion.id().value());
+        if (view == null || !(view.body() instanceof WrapperLivingEntity body)) {
+            return;
+        }
+
+        this.equipArmor(body.getEquipment(), minion);
+        body.getEquipment().refresh();
+    }
+
+    @Override
     public final void refreshHologram(Minion minion) {
         RenderedMinion view = this.rendered.get(minion.id().value());
         if (view != null) {
@@ -130,6 +142,8 @@ abstract class AbstractEntityLibMinionRenderer implements MinionRenderer {
     }
 
     abstract WrapperEntity createBody(Minion minion);
+
+    abstract void equipArmor(WrapperEntityEquipment equipment, Minion minion);
 
     abstract void animate(long minionId, RenderedMinion minion, float targetYaw);
 }

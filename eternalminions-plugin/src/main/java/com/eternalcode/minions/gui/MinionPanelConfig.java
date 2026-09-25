@@ -256,9 +256,11 @@ public final class MinionPanelConfig extends ConfigurationFile {
         ));
         elements.put('W', element(
             MinionPanelAction.SKINS,
-            XMaterial.LEATHER_CHESTPLATE,
+            XMaterial.NETHERITE_CHESTPLATE,
             "<green>Wygląd",
-            "<gray>Teraz: <aqua>{MINION_SKIN}",
+            "<gray>Wzór zbroi: <aqua>{MINION_SKIN}",
+            "<gray>Kolor zbroi rośnie z poziomem",
+            "<gray>i ulepszeniami minionka.",
             "",
             "<gray>Nowe wyglądy kupisz tu za monety wyspy.",
             "",

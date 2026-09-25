@@ -6,7 +6,6 @@ import eu.okaeri.configs.annotation.Comment;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.bukkit.Color;
 
 public final class MinionSkinsConfig extends ConfigurationFile {
 
@@ -26,18 +25,18 @@ public final class MinionSkinsConfig extends ConfigurationFile {
 
     private static Map<String, MinionSkinConfig> defaultSkins() {
         Map<String, MinionSkinConfig> skins = new LinkedHashMap<>();
-        skins.put("zloty", MinionSkinConfig.of("<gold>Złoty", XMaterial.GOLD_INGOT, Color.fromRGB(0xF2C94C),
-            "<gray>Złota zbroja dla minionka,", "<gray>który zarabia najwięcej."));
-        skins.put("lodowy", MinionSkinConfig.of("<aqua>Lodowy", XMaterial.PACKED_ICE, Color.fromRGB(0x8FD3FF),
-            "<gray>Chłodny błękit na każdą wyspę."));
-        skins.put("ognisty", MinionSkinConfig.of("<red>Ognisty", XMaterial.BLAZE_POWDER, Color.fromRGB(0xE8452C),
-            "<gray>Płomienna czerwień dla", "<gray>najszybszych minionków."));
-        skins.put("nocny", MinionSkinConfig.of("<dark_gray>Nocny", XMaterial.BLACK_DYE, Color.fromRGB(0x23232B),
-            "<gray>Ciemny strój na nocną zmianę."));
-        skins.put("lesny", MinionSkinConfig.of("<green>Leśny", XMaterial.OAK_SAPLING, Color.fromRGB(0x3E8E41),
-            "<gray>Zieleń prosto z lasu."));
-        skins.put("krolewski", MinionSkinConfig.of("<light_purple>Królewski", XMaterial.AMETHYST_SHARD,
-            Color.fromRGB(0x8E44AD), "<gray>Purpura godna króla wyspy."));
+        skins.put("duch", MinionSkinConfig.of("<aqua>Duch", XMaterial.VEX_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:vex", 50_000, "<gray>Wzór widma na zbroi minionka."));
+        skins.put("dziki", MinionSkinConfig.of("<green>Dziki", XMaterial.WILD_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:wild", 50_000, "<gray>Wzór prosto z dżungli."));
+        skins.put("oko", MinionSkinConfig.of("<dark_aqua>Oko", XMaterial.EYE_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:eye", 75_000, "<gray>Wzór z twierdzy Endu."));
+        skins.put("przyplyw", MinionSkinConfig.of("<blue>Przypływ", XMaterial.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:tide", 75_000, "<gray>Wzór strażnika oceanu."));
+        skins.put("iglica", MinionSkinConfig.of("<light_purple>Iglica", XMaterial.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:spire", 100_000, "<gray>Wzór z miasta Endu."));
+        skins.put("cisza", MinionSkinConfig.of("<dark_gray>Cisza", XMaterial.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE,
+            "minecraft:silence", 150_000, "<gray>Najrzadszy wzór, prosto", "<gray>z Pradawnego Miasta."));
         return skins;
     }
 }

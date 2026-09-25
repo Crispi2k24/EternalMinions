@@ -3,6 +3,7 @@ package com.eternalcode.minions.render;
 import com.eternalcode.minions.addon.MinionSkins;
 import com.eternalcode.minions.config.MinionItemsConfig;
 import com.eternalcode.minions.item.MinionAppearanceItems;
+import com.eternalcode.minions.item.MinionTrimArmor;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
@@ -56,6 +57,7 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
     private final MinionBehaviorRegistry behaviors;
     private final MinionAppearanceItems appearance;
     private final MinionSkins skins;
+    private final MinionTrimArmor trimArmor;
     private final Long2LongOpenHashMap swingStates = new Long2LongOpenHashMap();
     private final Set<Object> touchedChannels = new HashSet<>();
     private final ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
@@ -67,12 +69,14 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
             MinionEntityIndex entityIndex,
             MinionBehaviorRegistry behaviors,
             MinionAppearanceItems appearance,
-            MinionSkins skins
+            MinionSkins skins,
+            MinionTrimArmor trimArmor
     ) {
         super(holograms, entityIndex);
         this.behaviors = behaviors;
         this.appearance = appearance;
         this.skins = skins;
+        this.trimArmor = trimArmor;
     }
 
     private static Vector3f[] createSwingFrames() {
@@ -162,19 +166,31 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
         body.setHasNoGravity(true);
 
         WrapperEntityEquipment equipment = body.getEquipment();
-        MinionBehavior behavior = this.behaviors.find(minion.behaviorId()).orElse(null);
-
-        if (behavior != null) {
-            MinionItemsConfig items = this.skins.skin(minion).map(skin -> skin.items).orElse(behavior.config().items);
-            equipment.setHelmet(equipmentItem(this.appearance.helmet(behavior.config(), items)));
-            equipment.setChestplate(equipmentItem(this.appearance.chestplate(items)));
-            equipment.setLeggings(equipmentItem(this.appearance.leggings(items)));
-            equipment.setBoots(equipmentItem(this.appearance.boots(items)));
-        }
+        this.equipArmor(equipment, minion);
 
         equipment.setMainHand(equipmentItem(minion.equipment().tool()));
 
         return body;
+    }
+
+    @Override
+    void equipArmor(WrapperEntityEquipment equipment, Minion minion) {
+        MinionBehavior behavior = this.behaviors.find(minion.behaviorId()).orElse(null);
+        if (behavior == null) {
+            return;
+        }
+
+        MinionItemsConfig items = this.skins.skin(minion).map(skin -> skin.items).orElse(behavior.config().items);
+        equipment.setHelmet(equipmentItem(this.appearance.helmet(behavior.config(), items)));
+        if (this.trimArmor.enabled()) {
+            equipment.setChestplate(equipmentItem(this.trimArmor.chestplate(minion)));
+            equipment.setLeggings(equipmentItem(this.trimArmor.leggings(minion)));
+            equipment.setBoots(equipmentItem(this.trimArmor.boots(minion)));
+            return;
+        }
+        equipment.setChestplate(equipmentItem(this.appearance.chestplate(items)));
+        equipment.setLeggings(equipmentItem(this.appearance.leggings(items)));
+        equipment.setBoots(equipmentItem(this.appearance.boots(items)));
     }
 
     @Override

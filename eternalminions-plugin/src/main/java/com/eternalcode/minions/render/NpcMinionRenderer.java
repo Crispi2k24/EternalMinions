@@ -5,6 +5,7 @@ import com.eternalcode.minions.addon.MinionSkins;
 import com.eternalcode.minions.config.MinionItemsConfig;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.item.MinionAppearanceItems;
+import com.eternalcode.minions.item.MinionTrimArmor;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
 import com.github.retrooper.packetevents.protocol.attribute.Attributes;
@@ -27,18 +28,21 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
     private final MinionBehaviorRegistry behaviors;
     private final MinionAppearanceItems appearance;
     private final MinionSkins skins;
+    private final MinionTrimArmor trimArmor;
 
     public NpcMinionRenderer(
         EntityLibHologramRenderer holograms,
         MinionEntityIndex entityIndex,
         MinionBehaviorRegistry behaviors,
         MinionAppearanceItems appearance,
-        MinionSkins skins
+        MinionSkins skins,
+        MinionTrimArmor trimArmor
     ) {
         super(holograms, entityIndex);
         this.behaviors = behaviors;
         this.appearance = appearance;
         this.skins = skins;
+        this.trimArmor = trimArmor;
     }
 
     @Override
@@ -67,7 +71,7 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
             if (!skin.isEmpty()) {
                 meta.setProfile(createSkinProfile(skin));
             }
-            this.equipArmor(equipment, behavior, items);
+            this.equipArmor(equipment, minion);
         }
         equipment.setMainHand(equipmentItem(minion.equipment().tool()));
         return body;
@@ -79,10 +83,23 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
         ((WrapperLivingEntity) minion.body()).swingMainHand();
     }
 
-    private void equipArmor(WrapperEntityEquipment equipment, MinionBehavior behavior, MinionItemsConfig items) {
+    @Override
+    void equipArmor(WrapperEntityEquipment equipment, Minion minion) {
+        MinionBehavior behavior = this.behaviors.find(minion.behaviorId()).orElse(null);
+        if (behavior == null) {
+            return;
+        }
+
+        MinionItemsConfig items = this.skins.skin(minion).map(skin -> skin.items).orElse(behavior.config().items);
         ItemStack helmet = this.appearance.helmet(behavior.config(), items);
         if (helmet == null || helmet.getType() != Material.PLAYER_HEAD) {
             equipment.setHelmet(equipmentItem(helmet));
+        }
+        if (this.trimArmor.enabled()) {
+            equipment.setChestplate(equipmentItem(this.trimArmor.chestplate(minion)));
+            equipment.setLeggings(equipmentItem(this.trimArmor.leggings(minion)));
+            equipment.setBoots(equipmentItem(this.trimArmor.boots(minion)));
+            return;
         }
         equipment.setChestplate(equipmentItem(this.appearance.chestplate(items)));
         equipment.setLeggings(equipmentItem(this.appearance.leggings(items)));

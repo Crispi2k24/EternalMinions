@@ -193,6 +193,9 @@ public final class MinionScheduler implements Runnable {
         if (statusChanged || levelChanged) {
             this.renderer.refreshHologram(updated);
         }
+        if (levelChanged) {
+            this.renderer.refreshAppearance(updated);
+        }
 
         float animationYaw = scheduledMinion.consumeAnimationYaw();
         if (result.worked() && !Float.isNaN(animationYaw)) {

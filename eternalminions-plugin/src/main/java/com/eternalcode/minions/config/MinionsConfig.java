@@ -76,6 +76,35 @@ public final class MinionsConfig extends ConfigurationFile {
     @Comment("Rules that reduce or stop minion activity based on the owner's status.")
     public ActivityConfig activity = new ActivityConfig();
 
+    @Comment("Armor worn by every minion.")
+    public ArmorConfig armor = new ArmorConfig();
+
+    public static class ArmorConfig extends OkaeriConfig {
+
+        @Comment("Netherite armor with trims instead of the profession's leather set.")
+        public boolean netheriteTrims = true;
+
+        @Comment("Trim pattern of a minion without a skin, e.g. minecraft:sentry.")
+        public String defaultPattern = "minecraft:sentry";
+
+        @Comment({
+            "Trim material by progress - levels above the first plus every purchased upgrade tier.",
+            "The entry with the highest progress not above the minion's own applies."
+        })
+        public Map<Integer, String> progressMaterials = defaultProgressMaterials();
+
+        private static Map<Integer, String> defaultProgressMaterials() {
+            Map<Integer, String> materials = new LinkedHashMap<>();
+            materials.put(0, "minecraft:copper");
+            materials.put(2, "minecraft:iron");
+            materials.put(4, "minecraft:gold");
+            materials.put(6, "minecraft:emerald");
+            materials.put(8, "minecraft:diamond");
+            materials.put(10, "minecraft:amethyst");
+            return materials;
+        }
+    }
+
     public static class LimitsConfig extends OkaeriConfig {
 
         @Comment({
