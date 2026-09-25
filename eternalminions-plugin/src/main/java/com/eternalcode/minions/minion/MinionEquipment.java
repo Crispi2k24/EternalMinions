@@ -12,6 +12,7 @@ public final class MinionEquipment {
     private final int fuelTicksLeft;
     private final ItemStack firstModule;
     private final ItemStack secondModule;
+    private final String skinId;
     private final long visualRevision;
 
     public MinionEquipment(ItemStack tool) {
@@ -19,7 +20,7 @@ public final class MinionEquipment {
     }
 
     public MinionEquipment(ItemStack tool, ItemStack fuel, ItemStack firstModule, ItemStack secondModule) {
-        this(tool, fuel, 0, firstModule, secondModule, 0L);
+        this(tool, fuel, 0, firstModule, secondModule, null, 0L);
     }
 
     private MinionEquipment(
@@ -28,6 +29,7 @@ public final class MinionEquipment {
             int fuelTicksLeft,
             ItemStack firstModule,
             ItemStack secondModule,
+            String skinId,
             long visualRevision
     ) {
         this.tool = copy(tool);
@@ -35,6 +37,7 @@ public final class MinionEquipment {
         this.fuelTicksLeft = this.fuel == null ? 0 : Math.max(0, fuelTicksLeft);
         this.firstModule = copy(firstModule);
         this.secondModule = copy(secondModule);
+        this.skinId = skinId == null || skinId.isBlank() ? null : skinId;
         this.visualRevision = visualRevision;
     }
 
@@ -62,9 +65,14 @@ public final class MinionEquipment {
         return copy(this.secondModule);
     }
 
+    public String skinId() {
+        return this.skinId;
+    }
+
     public MinionEquipment withTool(ItemStack tool) {
         return new MinionEquipment(
-                tool, this.fuel, this.fuelTicksLeft, this.firstModule, this.secondModule, this.visualRevision + 1L);
+                tool, this.fuel, this.fuelTicksLeft, this.firstModule, this.secondModule, this.skinId,
+                this.visualRevision + 1L);
     }
 
     public MinionEquipment withDurability(ItemStack tool) {
@@ -73,27 +81,37 @@ public final class MinionEquipment {
         }
 
         return new MinionEquipment(
-                tool, this.fuel, this.fuelTicksLeft, this.firstModule, this.secondModule, this.visualRevision);
+                tool, this.fuel, this.fuelTicksLeft, this.firstModule, this.secondModule, this.skinId,
+                this.visualRevision);
     }
 
     public MinionEquipment withFuel(ItemStack fuel) {
         return new MinionEquipment(
-                this.tool, fuel, 0, this.firstModule, this.secondModule, this.visualRevision);
+                this.tool, fuel, 0, this.firstModule, this.secondModule, this.skinId, this.visualRevision);
     }
 
     public MinionEquipment withFuelTicksLeft(int fuelTicksLeft) {
         return new MinionEquipment(
-                this.tool, this.fuel, fuelTicksLeft, this.firstModule, this.secondModule, this.visualRevision);
+                this.tool, this.fuel, fuelTicksLeft, this.firstModule, this.secondModule, this.skinId,
+                this.visualRevision);
     }
 
     public MinionEquipment withFirstModule(ItemStack module) {
         return new MinionEquipment(
-                this.tool, this.fuel, this.fuelTicksLeft, module, this.secondModule, this.visualRevision);
+                this.tool, this.fuel, this.fuelTicksLeft, module, this.secondModule, this.skinId,
+                this.visualRevision);
     }
 
     public MinionEquipment withSecondModule(ItemStack module) {
         return new MinionEquipment(
-                this.tool, this.fuel, this.fuelTicksLeft, this.firstModule, module, this.visualRevision);
+                this.tool, this.fuel, this.fuelTicksLeft, this.firstModule, module, this.skinId,
+                this.visualRevision);
+    }
+
+    public MinionEquipment withSkin(String skinId) {
+        return new MinionEquipment(
+                this.tool, this.fuel, this.fuelTicksLeft, this.firstModule, this.secondModule, skinId,
+                this.visualRevision);
     }
 
     public int toolDamage() {
@@ -120,7 +138,8 @@ public final class MinionEquipment {
 
         return !Objects.equals(this.fuel, previous.fuel)
                 || !Objects.equals(this.firstModule, previous.firstModule)
-                || !Objects.equals(this.secondModule, previous.secondModule);
+                || !Objects.equals(this.secondModule, previous.secondModule)
+                || !Objects.equals(this.skinId, previous.skinId);
     }
 
     private static ItemStack copy(ItemStack item) {

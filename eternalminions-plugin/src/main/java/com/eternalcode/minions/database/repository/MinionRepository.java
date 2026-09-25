@@ -19,6 +19,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +150,10 @@ public final class MinionRepository extends AbstractRepositoryOrmLite {
         }
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.FIRST_MODULE, minion.serializedFirstModule());
         this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.SECOND_MODULE, minion.serializedSecondModule());
+        if (minion.skinId() != null) {
+            this.insertEquipmentSlot(
+                    minion.id(), MinionEquipmentSlot.SKIN, minion.skinId().getBytes(StandardCharsets.UTF_8));
+        }
     }
 
     private void insertEquipmentSlot(long minionId, MinionEquipmentSlot slot, byte[] serializedItem) throws Exception {

@@ -1,0 +1,27 @@
+package com.eternalcode.minions.addon;
+
+import com.eternalcode.minions.minion.Minion;
+import java.util.Optional;
+import org.bukkit.entity.Player;
+
+public final class MinionSkins {
+
+    private final MinionSkinsConfig config;
+
+    public MinionSkins(MinionSkinsConfig config) {
+        this.config = config;
+    }
+
+    public Optional<MinionSkinConfig> skin(Minion minion) {
+        String skinId = minion.equipment().skinId();
+        return skinId == null ? Optional.empty() : Optional.ofNullable(this.config.skins.get(skinId));
+    }
+
+    public boolean owns(Player player, String skinId) {
+        return player.hasPermission(this.config.permissionPrefix + skinId);
+    }
+
+    public MinionSkinsConfig config() {
+        return this.config;
+    }
+}

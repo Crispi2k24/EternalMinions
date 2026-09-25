@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.eternalcode.minions.config.AbstractMinionConfig;
 import com.eternalcode.minions.config.MinionArmorPieceConfig;
+import com.eternalcode.minions.config.MinionItemsConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import org.bukkit.Server;
@@ -41,19 +42,36 @@ public final class MinionAppearanceItems {
     }
 
     public ItemStack helmet(AbstractMinionConfig config) {
-        return this.armor(config.items.helmet, this.head(config));
+        return this.helmet(config, config.items);
+    }
+
+    public ItemStack helmet(AbstractMinionConfig config, MinionItemsConfig items) {
+        String texture = items.helmet.texture.isEmpty() ? resolveHeadTexture(config) : items.helmet.texture;
+        return this.armor(items.helmet, this.head(texture));
     }
 
     public ItemStack chestplate(AbstractMinionConfig config) {
-        return this.armor(config.items.chestplate, null);
+        return this.chestplate(config.items);
+    }
+
+    public ItemStack chestplate(MinionItemsConfig items) {
+        return this.armor(items.chestplate, null);
     }
 
     public ItemStack leggings(AbstractMinionConfig config) {
-        return this.armor(config.items.leggings, null);
+        return this.leggings(config.items);
+    }
+
+    public ItemStack leggings(MinionItemsConfig items) {
+        return this.armor(items.leggings, null);
     }
 
     public ItemStack boots(AbstractMinionConfig config) {
-        return this.armor(config.items.boots, null);
+        return this.boots(config.items);
+    }
+
+    public ItemStack boots(MinionItemsConfig items) {
+        return this.armor(items.boots, null);
     }
 
     // The ARMOR_STAND renderer only ever shows this head texture (never npcSkin directly), so if an

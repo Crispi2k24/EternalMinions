@@ -32,7 +32,7 @@ public final class MinionPanelConfig extends ConfigurationFile {
         "SSSSSSSSS",
         "SSSSSSSSS",
         "#########",
-        "#T#RCL#UP"
+        "#TWRCL#UP"
     );
 
     @Comment("Inventory slot occupied by the profession usage instructions.")
@@ -87,6 +87,33 @@ public final class MinionPanelConfig extends ConfigurationFile {
         XMaterial.ARROW,
         "<yellow>Powrót",
         "<gray>Wróć do panelu minionka."
+    );
+
+    @Comment("Title of the skin selection panel. Supports MiniMessage.")
+    public String skinsTitle = "Minionek - wygląd";
+
+    @Comment("Text used by the {MINION_SKIN} placeholder when the minion wears its profession's own look.")
+    public String skinDefaultText = "domyślny";
+
+    @Comment("Icon of the profession's own look in the skin selection panel.")
+    public MinionPanelElementConfig skinDefault = element(
+        MinionPanelAction.NONE,
+        XMaterial.ARMOR_STAND,
+        "<green>Domyślny wygląd",
+        "<gray>Wygląd zawodu minionka."
+    );
+
+    @Comment("Lore appended to a skin the player owns.")
+    public List<String> skinOwnedLore = List.of("", "<yellow>Kliknij, aby założyć!");
+
+    @Comment("Lore appended to the skin the minion wears.")
+    public List<String> skinWornLore = List.of("", "<green>Minionek nosi ten wygląd.");
+
+    @Comment("Lore appended to a skin the player does not own.")
+    public List<String> skinLockedLore = List.of(
+        "",
+        "<red>Nie masz tego wyglądu.",
+        "<gray>Kupisz go w <aqua>/portfel<gray>."
     );
 
     @Comment("Lore appended to an upgrade icon that reached its maximum tier.")
@@ -225,6 +252,16 @@ public final class MinionPanelConfig extends ConfigurationFile {
             "<gray>Skrzynia: {MINION_CHEST}",
             "",
             "<yellow>Kliknij, aby podłączyć lub odłączyć!"
+        ));
+        elements.put('W', element(
+            MinionPanelAction.SKINS,
+            XMaterial.LEATHER_CHESTPLATE,
+            "<green>Wygląd",
+            "<gray>Teraz: <aqua>{MINION_SKIN}",
+            "",
+            "<gray>Skórki kupisz w <aqua>/portfel<gray>.",
+            "",
+            "<yellow>Kliknij, aby zmienić!"
         ));
         elements.put('U', element(
             MinionPanelAction.UPGRADES,

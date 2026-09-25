@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.addon.MinionAddonType;
 import com.eternalcode.minions.addon.MinionFuelService;
+import com.eternalcode.minions.addon.MinionSkins;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MessagesConfig;
@@ -67,6 +68,8 @@ public final class MinionPanel implements Listener {
     private final MinionAddonItems addons;
     private final MinionFuelService fuels;
     private final UpgradesOpener openUpgrades;
+    private final UpgradesOpener openSkins;
+    private final MinionSkins skins;
     private final BiFunction<Player, Minion, Optional<Minion>> linkChest;
 
     public MinionPanel(
@@ -84,6 +87,8 @@ public final class MinionPanel implements Listener {
         MinionAddonItems addons,
         MinionFuelService fuels,
         UpgradesOpener openUpgrades,
+        UpgradesOpener openSkins,
+        MinionSkins skins,
         BiFunction<Player, Minion, Optional<Minion>> linkChest
     ) {
         this.plugin = plugin;
@@ -101,6 +106,8 @@ public final class MinionPanel implements Listener {
         this.addons = addons;
         this.fuels = fuels;
         this.openUpgrades = openUpgrades;
+        this.openSkins = openSkins;
+        this.skins = skins;
         this.linkChest = linkChest;
     }
 
@@ -260,6 +267,10 @@ public final class MinionPanel implements Listener {
             case UPGRADES -> this.createAccessibleElement(
                     player, minion, MinionAccessAction.OPEN_PANEL, element, placeholders,
                     current -> this.openUpgrades.open(player, current, () -> this.open(player, current))
+            );
+            case SKINS -> this.createAccessibleElement(
+                    player, minion, MinionAccessAction.MANAGE, element, placeholders,
+                    current -> this.openSkins.open(player, current, () -> this.open(player, current))
             );
             case LINK_CHEST -> this.createAccessibleElement(
                     player, minion, MinionAccessAction.MANAGE, element, placeholders,
@@ -448,6 +459,9 @@ public final class MinionPanel implements Listener {
         placeholders.put("{STORAGE_USED}", Integer.toString(this.countStoredItems(minion)));
         placeholders.put("{STORAGE_CAPACITY}", Integer.toString(minion.storage().capacity()));
         placeholders.put("{MINION_FUEL_TIME}", this.formatFuelTime(this.fuels.remainingTicks(minion)));
+        placeholders.put("{MINION_SKIN}", this.skins.skin(minion)
+            .map(skin -> skin.displayName)
+            .orElse(this.config.skinDefaultText));
         return placeholders;
     }
 

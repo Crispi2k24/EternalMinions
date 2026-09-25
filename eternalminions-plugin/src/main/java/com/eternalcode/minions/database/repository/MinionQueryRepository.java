@@ -20,6 +20,7 @@ import com.eternalcode.minions.minion.upgrade.MinionUpgradeTable;
 import com.eternalcode.minions.minion.upgrade.UpgradeKind;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -263,6 +264,7 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
                 equipment.fuelTicks(minion.id()),
                 equipment.addon(minion.id(), MinionEquipmentSlot.FIRST_MODULE),
                 equipment.addon(minion.id(), MinionEquipmentSlot.SECOND_MODULE),
+                equipment.skin(minion.id()),
                 storage.getOrDefault(minion.id(), List.of()),
                 upgrades.getOrDefault(minion.id(), Map.of()),
                 chests.get(minion.id()),
@@ -288,6 +290,11 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
             Map<Long, Integer> toolDamage,
             Map<Long, Map<String, byte[]>> addons
     ) {
+
+        private String skin(long minionId) {
+            byte[] serializedSkin = this.addon(minionId, MinionEquipmentSlot.SKIN);
+            return serializedSkin.length == 0 ? null : new String(serializedSkin, StandardCharsets.UTF_8);
+        }
 
         private int fuelTicks(long minionId) {
             byte[] serializedTicks = this.addon(minionId, MinionEquipmentSlot.FUEL_TICKS);

@@ -43,6 +43,7 @@ public final class MinionItemFactory {
     private final NamespacedKey fuelTicksKey;
     private final NamespacedKey firstModuleKey;
     private final NamespacedKey secondModuleKey;
+    private final NamespacedKey skinKey;
     private final NamespacedKey storageKey;
     private final NamespacedKey upgradesKey;
 
@@ -64,6 +65,7 @@ public final class MinionItemFactory {
         this.fuelTicksKey = new NamespacedKey(plugin, "minion_fuel_ticks");
         this.firstModuleKey = new NamespacedKey(plugin, "minion_first_module");
         this.secondModuleKey = new NamespacedKey(plugin, "minion_second_module");
+        this.skinKey = new NamespacedKey(plugin, "minion_skin");
         this.storageKey = new NamespacedKey(plugin, "minion_storage");
         this.upgradesKey = new NamespacedKey(plugin, "minion_upgrades");
     }
@@ -108,6 +110,9 @@ public final class MinionItemFactory {
         data.set(this.fuelTicksKey, PersistentDataType.INTEGER, minion.equipment().fuelTicksLeft());
         data.set(this.firstModuleKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().firstModule()));
         data.set(this.secondModuleKey, PersistentDataType.BYTE_ARRAY, encodeItem(minion.equipment().secondModule()));
+        if (minion.equipment().skinId() != null) {
+            data.set(this.skinKey, PersistentDataType.STRING, minion.equipment().skinId());
+        }
         data.set(this.storageKey, PersistentDataType.BYTE_ARRAY, encodeStorage(minion.storage()));
         data.set(this.upgradesKey, PersistentDataType.STRING, encodeUpgrades(minion.upgrades()));
         this.applyPresentation(
@@ -225,11 +230,12 @@ public final class MinionItemFactory {
         int fuelTicks = data.getOrDefault(this.fuelTicksKey, PersistentDataType.INTEGER, 0);
         byte[] firstModuleData = data.getOrDefault(this.firstModuleKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         byte[] secondModuleData = data.getOrDefault(this.secondModuleKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
+        String skinId = data.get(this.skinKey, PersistentDataType.STRING);
         byte[] storageData = data.getOrDefault(this.storageKey, PersistentDataType.BYTE_ARRAY, new byte[0]);
         String upgradesData = data.getOrDefault(this.upgradesKey, PersistentDataType.STRING, "");
         return Optional.of(new StoredMinionState(
             behaviorId, level, progress, decodeItem(toolData), decodeItem(fuelData), fuelTicks,
-            decodeItem(firstModuleData), decodeItem(secondModuleData), decodeStorage(storageData),
+            decodeItem(firstModuleData), decodeItem(secondModuleData), skinId, decodeStorage(storageData),
             decodeUpgrades(upgradesData)));
     }
 
@@ -242,6 +248,7 @@ public final class MinionItemFactory {
         int fuelTicksLeft,
         ItemStack firstModule,
         ItemStack secondModule,
+        String skinId,
         ItemStack[] storage,
         MinionUpgrades upgrades
     ) {

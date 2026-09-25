@@ -140,6 +140,14 @@ public final class MinionLifecycleService {
         this.fireUpdate(previous, minion, MinionUpdateType.TOOL, cause, actorId);
     }
 
+    public void updateSkin(Minion minion, UUID actorId) {
+        Minion previous = this.minions.replace(minion);
+        this.persistence.saveEquipment(minion);
+        this.renders.remove(minion);
+        this.renders.showToNearby(minion);
+        this.fireUpdate(previous, minion, MinionUpdateType.TOOL, MinionEventCause.INTERNAL, actorId);
+    }
+
     public void updateStorage(Minion minion) {
         this.updateStorage(minion, MinionEventCause.INTERNAL, null);
     }

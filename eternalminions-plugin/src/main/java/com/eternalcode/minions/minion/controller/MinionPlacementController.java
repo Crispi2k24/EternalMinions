@@ -105,7 +105,8 @@ public final class MinionPlacementController implements Listener {
                 .orElseGet(MinionProgress::start),
             state.map(stored -> new MinionEquipment(
                     stored.tool(), stored.fuel(), stored.firstModule(), stored.secondModule())
-                    .withFuelTicksLeft(stored.fuelTicksLeft()))
+                    .withFuelTicksLeft(stored.fuelTicksLeft())
+                    .withSkin(stored.skinId()))
                 .orElseGet(MinionEquipment::empty),
             this.createStorage(state.orElse(null), behavior, upgrades),
             upgrades,

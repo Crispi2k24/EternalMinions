@@ -1,5 +1,8 @@
 package com.eternalcode.minions.render;
 
+import com.eternalcode.minions.addon.MinionSkinConfig;
+import com.eternalcode.minions.addon.MinionSkins;
+import com.eternalcode.minions.config.MinionItemsConfig;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.item.MinionAppearanceItems;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
@@ -23,16 +26,19 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
 
     private final MinionBehaviorRegistry behaviors;
     private final MinionAppearanceItems appearance;
+    private final MinionSkins skins;
 
     public NpcMinionRenderer(
         EntityLibHologramRenderer holograms,
         MinionEntityIndex entityIndex,
         MinionBehaviorRegistry behaviors,
-        MinionAppearanceItems appearance
+        MinionAppearanceItems appearance,
+        MinionSkins skins
     ) {
         super(holograms, entityIndex);
         this.behaviors = behaviors;
         this.appearance = appearance;
+        this.skins = skins;
     }
 
     @Override
@@ -49,12 +55,19 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
         );
         WrapperEntityEquipment equipment = body.getEquipment();
         if (behavior != null) {
-            String headTexture = behavior.config().items.helmet.texture;
-            String skin = behavior.config().npcSkin.isEmpty() ? headTexture : behavior.config().npcSkin;
+            MinionSkinConfig minionSkin = this.skins.skin(minion).orElse(null);
+            MinionItemsConfig items = minionSkin == null ? behavior.config().items : minionSkin.items;
+            String headTexture = items.helmet.texture.isEmpty()
+                ? behavior.config().items.helmet.texture
+                : items.helmet.texture;
+            String npcSkin = minionSkin != null && !minionSkin.npcSkin.isEmpty()
+                ? minionSkin.npcSkin
+                : behavior.config().npcSkin;
+            String skin = npcSkin.isEmpty() ? headTexture : npcSkin;
             if (!skin.isEmpty()) {
                 meta.setProfile(createSkinProfile(skin));
             }
-            this.equipArmor(equipment, behavior);
+            this.equipArmor(equipment, behavior, items);
         }
         equipment.setMainHand(equipmentItem(minion.equipment().tool()));
         return body;
@@ -66,14 +79,14 @@ public final class NpcMinionRenderer extends AbstractEntityLibMinionRenderer {
         ((WrapperLivingEntity) minion.body()).swingMainHand();
     }
 
-    private void equipArmor(WrapperEntityEquipment equipment, MinionBehavior behavior) {
-        ItemStack helmet = this.appearance.helmet(behavior.config());
+    private void equipArmor(WrapperEntityEquipment equipment, MinionBehavior behavior, MinionItemsConfig items) {
+        ItemStack helmet = this.appearance.helmet(behavior.config(), items);
         if (helmet == null || helmet.getType() != Material.PLAYER_HEAD) {
             equipment.setHelmet(equipmentItem(helmet));
         }
-        equipment.setChestplate(equipmentItem(this.appearance.chestplate(behavior.config())));
-        equipment.setLeggings(equipmentItem(this.appearance.leggings(behavior.config())));
-        equipment.setBoots(equipmentItem(this.appearance.boots(behavior.config())));
+        equipment.setChestplate(equipmentItem(this.appearance.chestplate(items)));
+        equipment.setLeggings(equipmentItem(this.appearance.leggings(items)));
+        equipment.setBoots(equipmentItem(this.appearance.boots(items)));
     }
 
     private static ItemProfile createSkinProfile(String headTexture) {

@@ -13,6 +13,7 @@ import com.eternalcode.minions.minion.storage.MinionSettingsRepository;
 import com.eternalcode.minions.minion.storage.MinionStorageRepository;
 import com.eternalcode.minions.minion.upgrade.MinionUpgradeRepository;
 import com.eternalcode.minions.minion.upgrade.UpgradeKind;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -152,10 +153,18 @@ public final class MinionPersistenceService {
                                 minion, MinionEquipmentSlot.FIRST_MODULE, minion.equipment().firstModule()),
                         this.saveEquipmentSlot(
                                 minion, MinionEquipmentSlot.SECOND_MODULE, minion.equipment().secondModule()),
-                        this.saveFuelTicks(minion)
+                        this.saveFuelTicks(minion),
+                        this.saveSkin(minion)
                 ),
                 "save equipment for minion " + minion.id().value()
         );
+    }
+
+    private CompletableFuture<Void> saveSkin(Minion minion) {
+        String skinId = minion.equipment().skinId();
+        return skinId == null
+                ? this.equipment.deleteSlot(minion.id(), MinionEquipmentSlot.SKIN)
+                : this.equipment.saveSlot(minion.id(), MinionEquipmentSlot.SKIN, skinId.getBytes(StandardCharsets.UTF_8));
     }
 
     private CompletableFuture<Void> saveFuelTicks(Minion minion) {
@@ -273,6 +282,10 @@ public final class MinionPersistenceService {
                     ItemDataCodec.encode(after.secondModule())
             ));
             changes.add(fuelTicksChange(after));
+            changes.add(new MinionActionUpdate.EquipmentChange(
+                    MinionEquipmentSlot.SKIN,
+                    after.skinId() == null ? new byte[0] : after.skinId().getBytes(StandardCharsets.UTF_8)
+            ));
         }
         else if (fuelTicksNeedSaving(before, after)) {
             changes.add(fuelTicksChange(after));

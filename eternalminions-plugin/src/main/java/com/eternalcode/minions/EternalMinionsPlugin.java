@@ -5,6 +5,8 @@ import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.addon.MinionAnchorTickets;
 import com.eternalcode.minions.addon.MinionFuelService;
 import com.eternalcode.minions.addon.MinionModuleService;
+import com.eternalcode.minions.addon.MinionSkins;
+import com.eternalcode.minions.addon.MinionSkinsConfig;
 import com.eternalcode.minions.bridge.BridgeManager;
 import com.eternalcode.minions.bridge.economy.MinionEconomyServiceImpl;
 import com.eternalcode.minions.bridge.shop.MinionShopServiceImpl;
@@ -25,6 +27,7 @@ import com.eternalcode.minions.database.MinionPersistenceService;
 import com.eternalcode.minions.event.MinionEventCause;
 import com.eternalcode.minions.event.EventDispatcher;
 import com.eternalcode.minions.gui.MinionPanel;
+import com.eternalcode.minions.gui.MinionSkinPanel;
 import com.eternalcode.minions.gui.MinionUpgradePanel;
 import com.eternalcode.minions.item.MinionAppearanceItems;
 import com.eternalcode.minions.item.MinionItemFactory;
@@ -117,6 +120,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 MessagesConfig.class,
                 MinionPanelConfig.class,
                 MinionAddonConfig.class,
+                MinionSkinsConfig.class,
                 DatabaseConfig.class,
                 MinerConfig.class,
                 LumberjackConfig.class,
@@ -141,6 +145,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         MinionAddonItems addonItems = new MinionAddonItems(this, addonConfig, appearance, miniMessage);
         MinionFuelService fuels = new MinionFuelService(addonConfig, addonItems);
         MinionAnchorTickets anchors = new MinionAnchorTickets(this, fuels);
+        MinionSkins skins = new MinionSkins(configs.get(MinionSkinsConfig.class));
         KillerLootingListener killerLooting = new KillerLootingListener();
         SellerConfig sellerConfig = configs.get(SellerConfig.class);
 
@@ -189,7 +194,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 behaviors,
                 statusTracker,
                 entityIndex,
-                appearance
+                appearance,
+                skins
         );
         MinionRenderService renders =
                 new MinionRenderService(this.getServer(), this.minions, this.renderer, minionsConfig);
@@ -283,6 +289,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 lifecycle::updateSettings,
                 notices
         );
+        MinionSkinPanel skinPanel = new MinionSkinPanel(this, panelConfig, miniMessage, skins, access, lifecycle);
         MinionPanel panel = new MinionPanel(
                 this,
                 panelConfig,
@@ -298,6 +305,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 addonItems,
                 fuels,
                 upgradePanel::open,
+                skinPanel::open,
+                skins,
                 chestLinks::toggle
         );
         this.interactions = new MinionInteractionController(this, entityIndex, access, panel, rotations, pickups);

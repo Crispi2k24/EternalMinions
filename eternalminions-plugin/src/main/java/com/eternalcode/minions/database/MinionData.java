@@ -34,6 +34,7 @@ public record MinionData(
         int fuelTicksLeft,
         byte[] serializedFirstModule,
         byte[] serializedSecondModule,
+        String skinId,
         List<StoredItemData> storageItems,
         Map<String, Integer> upgrades,
         ChestPositionData chestPosition,
@@ -93,7 +94,7 @@ public record MinionData(
     ) {
         this(
                 id, ownerId, behaviorId, worldKey, blockX, blockY, blockZ, level, progress,
-                serializedTool, -1, new byte[0], 0, new byte[0], new byte[0],
+                serializedTool, -1, new byte[0], 0, new byte[0], new byte[0], null,
                 storageItems, upgrades, chestPosition, settings, System.currentTimeMillis()
         );
     }
@@ -125,7 +126,8 @@ public record MinionData(
                 ItemDataCodec.encode(minion.equipment().fuel()),
                 minion.equipment().fuelTicksLeft(),
                 ItemDataCodec.encode(minion.equipment().firstModule()),
-                ItemDataCodec.encode(minion.equipment().secondModule()), storageItems,
+                ItemDataCodec.encode(minion.equipment().secondModule()), minion.equipment().skinId(),
+                storageItems,
                 upgrades, chestPosition, minion.settings(), System.currentTimeMillis()
         );
     }
@@ -188,7 +190,7 @@ public record MinionData(
                         ItemDataCodec.decode(this.serializedFuel),
                         ItemDataCodec.decode(this.serializedFirstModule),
                         ItemDataCodec.decode(this.serializedSecondModule)
-                ).withFuelTicksLeft(this.fuelTicksLeft), storage, minionUpgrades,
+                ).withFuelTicksLeft(this.fuelTicksLeft).withSkin(this.skinId), storage, minionUpgrades,
                 this.chestPosition == null ? null : new MinionPosition(
                         this.chestPosition.worldKey(),
                         this.chestPosition.blockX(),

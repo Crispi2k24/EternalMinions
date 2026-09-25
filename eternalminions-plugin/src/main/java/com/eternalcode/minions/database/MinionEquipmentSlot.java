@@ -6,5 +6,6 @@ public enum MinionEquipmentSlot {
     FUEL,
     FIRST_MODULE,
     SECOND_MODULE,
-    FUEL_TICKS
+    FUEL_TICKS,
+    SKIN
 }

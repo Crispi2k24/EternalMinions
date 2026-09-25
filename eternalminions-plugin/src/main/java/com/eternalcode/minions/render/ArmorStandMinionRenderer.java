@@ -1,5 +1,7 @@
 package com.eternalcode.minions.render;
 
+import com.eternalcode.minions.addon.MinionSkins;
+import com.eternalcode.minions.config.MinionItemsConfig;
 import com.eternalcode.minions.item.MinionAppearanceItems;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
@@ -53,6 +55,7 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
 
     private final MinionBehaviorRegistry behaviors;
     private final MinionAppearanceItems appearance;
+    private final MinionSkins skins;
     private final Long2LongOpenHashMap swingStates = new Long2LongOpenHashMap();
     private final Set<Object> touchedChannels = new HashSet<>();
     private final ProtocolManager protocolManager = PacketEvents.getAPI().getProtocolManager();
@@ -63,11 +66,13 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
             EntityLibHologramRenderer holograms,
             MinionEntityIndex entityIndex,
             MinionBehaviorRegistry behaviors,
-            MinionAppearanceItems appearance
+            MinionAppearanceItems appearance,
+            MinionSkins skins
     ) {
         super(holograms, entityIndex);
         this.behaviors = behaviors;
         this.appearance = appearance;
+        this.skins = skins;
     }
 
     private static Vector3f[] createSwingFrames() {
@@ -160,10 +165,11 @@ public final class ArmorStandMinionRenderer extends AbstractEntityLibMinionRende
         MinionBehavior behavior = this.behaviors.find(minion.behaviorId()).orElse(null);
 
         if (behavior != null) {
-            equipment.setHelmet(equipmentItem(this.appearance.helmet(behavior.config())));
-            equipment.setChestplate(equipmentItem(this.appearance.chestplate(behavior.config())));
-            equipment.setLeggings(equipmentItem(this.appearance.leggings(behavior.config())));
-            equipment.setBoots(equipmentItem(this.appearance.boots(behavior.config())));
+            MinionItemsConfig items = this.skins.skin(minion).map(skin -> skin.items).orElse(behavior.config().items);
+            equipment.setHelmet(equipmentItem(this.appearance.helmet(behavior.config(), items)));
+            equipment.setChestplate(equipmentItem(this.appearance.chestplate(items)));
+            equipment.setLeggings(equipmentItem(this.appearance.leggings(items)));
+            equipment.setBoots(equipmentItem(this.appearance.boots(items)));
         }
 
         equipment.setMainHand(equipmentItem(minion.equipment().tool()));

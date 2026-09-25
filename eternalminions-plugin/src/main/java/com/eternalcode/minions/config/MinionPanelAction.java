@@ -12,6 +12,7 @@ public enum MinionPanelAction {
     COLLECT_ITEMS,
     PICKUP_MINION,
     UPGRADES,
+    SKINS,
     LINK_CHEST,
     ROTATE
 
