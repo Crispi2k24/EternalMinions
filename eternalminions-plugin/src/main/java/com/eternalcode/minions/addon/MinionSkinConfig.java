@@ -18,6 +18,9 @@ public final class MinionSkinConfig extends OkaeriConfig {
     @Comment("Icon of the skin in the skin selection panel.")
     public XMaterial icon = XMaterial.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE;
 
+    @Comment("Armor set worn with this skin while armor.netheriteTrims is enabled in config.yml.")
+    public MinionArmorSet armor = MinionArmorSet.NETHERITE;
+
     @Comment({
         "Armor trim pattern of this skin, e.g. minecraft:vex. The trim color still follows",
         "the minion's progress. Used while armor.netheriteTrims is enabled in config.yml."
@@ -33,8 +36,16 @@ public final class MinionSkinConfig extends OkaeriConfig {
     @Comment("NPC renderer only: player skin texture. Empty keeps the profession's own skin.")
     public String npcSkin = "";
 
-    static MinionSkinConfig of(String displayName, XMaterial icon, String trimPattern, int price, String... lore) {
+    static MinionSkinConfig of(
+        String displayName,
+        XMaterial icon,
+        MinionArmorSet armor,
+        String trimPattern,
+        int price,
+        String... lore
+    ) {
         MinionSkinConfig skin = new MinionSkinConfig();
+        skin.armor = armor;
         skin.displayName = displayName;
         skin.icon = icon;
         skin.trimPattern = trimPattern;

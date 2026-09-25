@@ -1,5 +1,6 @@
 package com.eternalcode.minions.item;
 
+import com.eternalcode.minions.addon.MinionArmorSet;
 import com.eternalcode.minions.addon.MinionSkins;
 import com.eternalcode.minions.config.MinionsConfig;
 import com.eternalcode.minions.minion.Minion;
@@ -30,15 +31,15 @@ public final class MinionTrimArmor {
     }
 
     public ItemStack chestplate(Minion minion) {
-        return this.piece(Material.NETHERITE_CHESTPLATE, minion);
+        return this.piece(this.armorSet(minion).chestplate(), minion);
     }
 
     public ItemStack leggings(Minion minion) {
-        return this.piece(Material.NETHERITE_LEGGINGS, minion);
+        return this.piece(this.armorSet(minion).leggings(), minion);
     }
 
     public ItemStack boots(Minion minion) {
-        return this.piece(Material.NETHERITE_BOOTS, minion);
+        return this.piece(this.armorSet(minion).boots(), minion);
     }
 
     public static int progress(Minion minion) {
@@ -69,6 +70,10 @@ public final class MinionTrimArmor {
             }
         }
         return material;
+    }
+
+    private MinionArmorSet armorSet(Minion minion) {
+        return this.skins.skin(minion).map(skin -> skin.armor).orElse(MinionArmorSet.NETHERITE);
     }
 
     private String patternKey(Minion minion) {

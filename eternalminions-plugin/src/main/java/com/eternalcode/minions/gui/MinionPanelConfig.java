@@ -100,7 +100,7 @@ public final class MinionPanelConfig extends ConfigurationFile {
         MinionPanelAction.NONE,
         XMaterial.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE,
         "<green>Domyślny wygląd",
-        "<gray>Podstawowy wzór zbroi minionka."
+        "<gray>Netherytowa zbroja ze wzorem Strażnik."
     );
 
     @Comment("Lore appended to a skin the player owns or got for free.")
@@ -258,7 +258,7 @@ public final class MinionPanelConfig extends ConfigurationFile {
             MinionPanelAction.SKINS,
             XMaterial.NETHERITE_CHESTPLATE,
             "<green>Wygląd",
-            "<gray>Wzór zbroi: <aqua>{MINION_SKIN}",
+            "<gray>Skórka: <aqua>{MINION_SKIN}",
             "<gray>Kolor zbroi rośnie z poziomem",
             "<gray>i ulepszeniami minionka.",
             "",

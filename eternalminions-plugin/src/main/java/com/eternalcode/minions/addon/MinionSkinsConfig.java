@@ -25,18 +25,24 @@ public final class MinionSkinsConfig extends ConfigurationFile {
 
     private static Map<String, MinionSkinConfig> defaultSkins() {
         Map<String, MinionSkinConfig> skins = new LinkedHashMap<>();
-        skins.put("duch", MinionSkinConfig.of("<aqua>Duch", XMaterial.VEX_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:vex", 50_000, "<gray>Wzór widma na zbroi minionka."));
-        skins.put("dziki", MinionSkinConfig.of("<green>Dziki", XMaterial.WILD_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:wild", 50_000, "<gray>Wzór prosto z dżungli."));
-        skins.put("oko", MinionSkinConfig.of("<dark_aqua>Oko", XMaterial.EYE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:eye", 75_000, "<gray>Wzór z twierdzy Endu."));
-        skins.put("przyplyw", MinionSkinConfig.of("<blue>Przypływ", XMaterial.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:tide", 75_000, "<gray>Wzór strażnika oceanu."));
+        skins.put("kolczuga", MinionSkinConfig.of("<gray>Kolczuga", XMaterial.CHAINMAIL_CHESTPLATE,
+            MinionArmorSet.CHAINMAIL, "minecraft:tide", 25_000,
+            "<gray>Kolczuga ze wzorem <aqua>Przypływ<gray>."));
+        skins.put("zelazny", MinionSkinConfig.of("<white>Żelazny", XMaterial.IRON_CHESTPLATE,
+            MinionArmorSet.IRON, "minecraft:wild", 40_000,
+            "<gray>Żelazna zbroja ze wzorem <aqua>Dziki<gray>."));
+        skins.put("zloty", MinionSkinConfig.of("<gold>Złoty", XMaterial.GOLDEN_CHESTPLATE,
+            MinionArmorSet.GOLDEN, "minecraft:eye", 60_000,
+            "<gray>Złota zbroja ze wzorem <aqua>Oko<gray>."));
+        skins.put("diamentowy", MinionSkinConfig.of("<aqua>Diamentowy", XMaterial.DIAMOND_CHESTPLATE,
+            MinionArmorSet.DIAMOND, "minecraft:vex", 100_000,
+            "<gray>Diamentowa zbroja ze wzorem <aqua>Duch<gray>."));
         skins.put("iglica", MinionSkinConfig.of("<light_purple>Iglica", XMaterial.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:spire", 100_000, "<gray>Wzór z miasta Endu."));
+            MinionArmorSet.NETHERITE, "minecraft:spire", 100_000,
+            "<gray>Netherytowa zbroja ze wzorem <aqua>Iglica<gray>."));
         skins.put("cisza", MinionSkinConfig.of("<dark_gray>Cisza", XMaterial.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE,
-            "minecraft:silence", 150_000, "<gray>Najrzadszy wzór, prosto", "<gray>z Pradawnego Miasta."));
+            MinionArmorSet.NETHERITE, "minecraft:silence", 150_000,
+            "<gray>Netherytowa zbroja z najrzadszym", "<gray>wzorem <aqua>Cisza<gray>."));
         return skins;
     }
 }

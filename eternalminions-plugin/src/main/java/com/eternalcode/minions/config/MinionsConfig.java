@@ -96,11 +96,16 @@ public final class MinionsConfig extends ConfigurationFile {
         private static Map<Integer, String> defaultProgressMaterials() {
             Map<Integer, String> materials = new LinkedHashMap<>();
             materials.put(0, "minecraft:copper");
-            materials.put(2, "minecraft:iron");
-            materials.put(4, "minecraft:gold");
+            materials.put(1, "minecraft:iron");
+            materials.put(2, "minecraft:quartz");
+            materials.put(3, "minecraft:redstone");
+            materials.put(4, "minecraft:lapis");
+            materials.put(5, "minecraft:gold");
             materials.put(6, "minecraft:emerald");
-            materials.put(8, "minecraft:diamond");
-            materials.put(10, "minecraft:amethyst");
+            materials.put(7, "minecraft:diamond");
+            materials.put(8, "minecraft:amethyst");
+            materials.put(9, "minecraft:resin");
+            materials.put(10, "minecraft:netherite");
             return materials;
         }
     }
