@@ -8,14 +8,30 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class MinionEquipment {
 
     private final ItemStack tool;
+    private final ItemStack fuel;
+    private final ItemStack firstModule;
+    private final ItemStack secondModule;
     private final long visualRevision;
 
     public MinionEquipment(ItemStack tool) {
-        this(tool, 0L);
+        this(tool, null, null, null);
     }
 
-    private MinionEquipment(ItemStack tool, long visualRevision) {
-        this.tool = tool == null ? null : tool.clone();
+    public MinionEquipment(ItemStack tool, ItemStack fuel, ItemStack firstModule, ItemStack secondModule) {
+        this(tool, fuel, firstModule, secondModule, 0L);
+    }
+
+    private MinionEquipment(
+            ItemStack tool,
+            ItemStack fuel,
+            ItemStack firstModule,
+            ItemStack secondModule,
+            long visualRevision
+    ) {
+        this.tool = copy(tool);
+        this.fuel = copy(fuel);
+        this.firstModule = copy(firstModule);
+        this.secondModule = copy(secondModule);
         this.visualRevision = visualRevision;
     }
 
@@ -24,11 +40,24 @@ public final class MinionEquipment {
     }
 
     public ItemStack tool() {
-        return this.tool == null ? null : this.tool.clone();
+        return copy(this.tool);
+    }
+
+    public ItemStack fuel() {
+        return copy(this.fuel);
+    }
+
+    public ItemStack firstModule() {
+        return copy(this.firstModule);
+    }
+
+    public ItemStack secondModule() {
+        return copy(this.secondModule);
     }
 
     public MinionEquipment withTool(ItemStack tool) {
-        return new MinionEquipment(tool, this.visualRevision + 1L);
+        return new MinionEquipment(
+                tool, this.fuel, this.firstModule, this.secondModule, this.visualRevision + 1L);
     }
 
     public MinionEquipment withDurability(ItemStack tool) {
@@ -36,7 +65,23 @@ public final class MinionEquipment {
             return this;
         }
 
-        return new MinionEquipment(tool, this.visualRevision);
+        return new MinionEquipment(
+                tool, this.fuel, this.firstModule, this.secondModule, this.visualRevision);
+    }
+
+    public MinionEquipment withFuel(ItemStack fuel) {
+        return new MinionEquipment(
+                this.tool, fuel, this.firstModule, this.secondModule, this.visualRevision);
+    }
+
+    public MinionEquipment withFirstModule(ItemStack module) {
+        return new MinionEquipment(
+                this.tool, this.fuel, module, this.secondModule, this.visualRevision);
+    }
+
+    public MinionEquipment withSecondModule(ItemStack module) {
+        return new MinionEquipment(
+                this.tool, this.fuel, this.firstModule, module, this.visualRevision);
     }
 
     public int toolDamage() {
@@ -54,5 +99,19 @@ public final class MinionEquipment {
         }
 
         return this.visualRevision != previous.visualRevision;
+    }
+
+    public boolean hasAddonChangeSince(MinionEquipment previous) {
+        if (previous == null) {
+            throw new IllegalArgumentException("Previous equipment is required");
+        }
+
+        return !Objects.equals(this.fuel, previous.fuel)
+                || !Objects.equals(this.firstModule, previous.firstModule)
+                || !Objects.equals(this.secondModule, previous.secondModule);
+    }
+
+    private static ItemStack copy(ItemStack item) {
+        return item == null ? null : item.clone();
     }
 }

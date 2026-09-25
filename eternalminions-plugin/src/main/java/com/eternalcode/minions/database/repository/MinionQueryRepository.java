@@ -58,6 +58,7 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
     private static EquipmentIndex indexEquipment(List<MinionEquipmentTable> rows) {
         Map<Long, byte[]> tools = new HashMap<>();
         Map<Long, Integer> toolDamage = new HashMap<>();
+        Map<Long, Map<String, byte[]>> addons = new HashMap<>();
         for (MinionEquipmentTable row : rows) {
             byte[] serializedItem = row.serializedItem();
             if (serializedItem.length == 0) {
@@ -70,9 +71,11 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
             }
             if (row.slot().equals(MinionEquipmentSlot.TOOL_DAMAGE.name())) {
                 toolDamage.put(row.minionId(), ItemDataCodec.decodeInteger(serializedItem));
+                continue;
             }
+            addons.computeIfAbsent(row.minionId(), ignored -> new HashMap<>()).put(row.slot(), serializedItem);
         }
-        return new EquipmentIndex(tools, toolDamage);
+        return new EquipmentIndex(tools, toolDamage, addons);
     }
 
     private static Map<Long, List<StoredItemData>> indexStorage(List<MinionStorageTable> rows) {
@@ -256,6 +259,9 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
                 state.progress(),
                 equipment.tools().getOrDefault(minion.id(), new byte[0]),
                 equipment.toolDamage().getOrDefault(minion.id(), -1),
+                equipment.addon(minion.id(), MinionEquipmentSlot.FUEL),
+                equipment.addon(minion.id(), MinionEquipmentSlot.FIRST_MODULE),
+                equipment.addon(minion.id(), MinionEquipmentSlot.SECOND_MODULE),
                 storage.getOrDefault(minion.id(), List.of()),
                 upgrades.getOrDefault(minion.id(), Map.of()),
                 chests.get(minion.id()),
@@ -276,6 +282,14 @@ final class MinionQueryRepository extends AbstractRepositoryOrmLite {
         return loaded;
     }
 
-    private record EquipmentIndex(Map<Long, byte[]> tools, Map<Long, Integer> toolDamage) {
+    private record EquipmentIndex(
+            Map<Long, byte[]> tools,
+            Map<Long, Integer> toolDamage,
+            Map<Long, Map<String, byte[]>> addons
+    ) {
+
+        private byte[] addon(long minionId, MinionEquipmentSlot slot) {
+            return this.addons.getOrDefault(minionId, Map.of()).getOrDefault(slot.name(), new byte[0]);
+        }
     }
 }

@@ -141,9 +141,24 @@ public final class MinionPersistenceService {
         CompletableFuture<Void> damageOperation =
                 this.equipment.deleteSlot(minion.id(), MinionEquipmentSlot.TOOL_DAMAGE);
         this.report(
-                CompletableFuture.allOf(toolOperation, damageOperation),
+                CompletableFuture.allOf(
+                        toolOperation,
+                        damageOperation,
+                        this.saveEquipmentSlot(minion, MinionEquipmentSlot.FUEL, minion.equipment().fuel()),
+                        this.saveEquipmentSlot(
+                                minion, MinionEquipmentSlot.FIRST_MODULE, minion.equipment().firstModule()),
+                        this.saveEquipmentSlot(
+                                minion, MinionEquipmentSlot.SECOND_MODULE, minion.equipment().secondModule())
+                ),
                 "save equipment for minion " + minion.id().value()
         );
+    }
+
+    private CompletableFuture<Void> saveEquipmentSlot(Minion minion, MinionEquipmentSlot slot, ItemStack item) {
+        byte[] serializedItem = ItemDataCodec.encode(item);
+        return serializedItem.length == 0
+                ? this.equipment.deleteSlot(minion.id(), slot)
+                : this.equipment.saveSlot(minion.id(), slot, serializedItem);
     }
 
     public void saveEquipmentDamage(Minion minion) {
@@ -228,6 +243,30 @@ public final class MinionPersistenceService {
     private List<MinionActionUpdate.EquipmentChange> equipmentChanges(Minion previous, Minion updated) {
         if (previous.equipment() == updated.equipment()) {
             return List.of();
+        }
+        if (updated.equipment().hasAddonChangeSince(previous.equipment())) {
+            return List.of(
+                    new MinionActionUpdate.EquipmentChange(
+                            MinionEquipmentSlot.TOOL,
+                            ItemDataCodec.encode(updated.equipment().tool())
+                    ),
+                    new MinionActionUpdate.EquipmentChange(
+                            MinionEquipmentSlot.TOOL_DAMAGE,
+                            new byte[0]
+                    ),
+                    new MinionActionUpdate.EquipmentChange(
+                            MinionEquipmentSlot.FUEL,
+                            ItemDataCodec.encode(updated.equipment().fuel())
+                    ),
+                    new MinionActionUpdate.EquipmentChange(
+                            MinionEquipmentSlot.FIRST_MODULE,
+                            ItemDataCodec.encode(updated.equipment().firstModule())
+                    ),
+                    new MinionActionUpdate.EquipmentChange(
+                            MinionEquipmentSlot.SECOND_MODULE,
+                            ItemDataCodec.encode(updated.equipment().secondModule())
+                    )
+            );
         }
         if (updated.equipment().hasVisualChangeSince(previous.equipment())) {
             return List.of(

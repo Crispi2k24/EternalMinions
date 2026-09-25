@@ -30,6 +30,9 @@ public record MinionData(
         long progress,
         byte[] serializedTool,
         int toolDamage,
+        byte[] serializedFuel,
+        byte[] serializedFirstModule,
+        byte[] serializedSecondModule,
         List<StoredItemData> storageItems,
         Map<String, Integer> upgrades,
         ChestPositionData chestPosition,
@@ -60,6 +63,9 @@ public record MinionData(
             throw new IllegalArgumentException("Minion creation time cannot be negative");
         }
         serializedTool = serializedTool.clone();
+        serializedFuel = serializedFuel == null ? new byte[0] : serializedFuel.clone();
+        serializedFirstModule = serializedFirstModule == null ? new byte[0] : serializedFirstModule.clone();
+        serializedSecondModule = serializedSecondModule == null ? new byte[0] : serializedSecondModule.clone();
         storageItems = List.copyOf(storageItems);
         upgrades = Map.copyOf(upgrades);
         settings = settings == null ? MinionSettings.defaults() : settings;
@@ -83,7 +89,8 @@ public record MinionData(
     ) {
         this(
                 id, ownerId, behaviorId, worldKey, blockX, blockY, blockZ, level, progress,
-                serializedTool, -1, storageItems, upgrades, chestPosition, settings, System.currentTimeMillis()
+                serializedTool, -1, new byte[0], new byte[0], new byte[0],
+                storageItems, upgrades, chestPosition, settings, System.currentTimeMillis()
         );
     }
 
@@ -110,7 +117,10 @@ public record MinionData(
         return new MinionData(
                 minion.id().value(), minion.ownerId(), minion.behaviorId(), position.worldKey(),
                 position.blockX(), position.blockY(), position.blockZ(), minion.progress().level(),
-                minion.progress().progress(), ItemDataCodec.encode(minion.equipment().tool()), -1, storageItems,
+                minion.progress().progress(), ItemDataCodec.encode(minion.equipment().tool()), -1,
+                ItemDataCodec.encode(minion.equipment().fuel()),
+                ItemDataCodec.encode(minion.equipment().firstModule()),
+                ItemDataCodec.encode(minion.equipment().secondModule()), storageItems,
                 upgrades, chestPosition, minion.settings(), System.currentTimeMillis()
         );
     }
@@ -118,6 +128,21 @@ public record MinionData(
     @Override
     public byte[] serializedTool() {
         return this.serializedTool.clone();
+    }
+
+    @Override
+    public byte[] serializedFuel() {
+        return this.serializedFuel.clone();
+    }
+
+    @Override
+    public byte[] serializedFirstModule() {
+        return this.serializedFirstModule.clone();
+    }
+
+    @Override
+    public byte[] serializedSecondModule() {
+        return this.serializedSecondModule.clone();
     }
 
     public Minion restore() {
@@ -153,7 +178,12 @@ public record MinionData(
                 new MinionId(this.id), this.ownerId, this.behaviorId,
                 new MinionPosition(this.worldKey, this.blockX, this.blockY, this.blockZ),
                 new MinionProgress(this.level, this.progress),
-                new MinionEquipment(tool), storage, minionUpgrades,
+                new MinionEquipment(
+                        tool,
+                        ItemDataCodec.decode(this.serializedFuel),
+                        ItemDataCodec.decode(this.serializedFirstModule),
+                        ItemDataCodec.decode(this.serializedSecondModule)
+                ), storage, minionUpgrades,
                 this.chestPosition == null ? null : new MinionPosition(
                         this.chestPosition.worldKey(),
                         this.chestPosition.blockX(),

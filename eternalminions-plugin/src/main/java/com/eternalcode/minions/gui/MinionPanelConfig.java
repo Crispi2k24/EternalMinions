@@ -28,7 +28,7 @@ public final class MinionPanelConfig extends ConfigurationFile {
     @Comment("Each row contains exactly 9 symbols. The number of rows defines the inventory size.")
     public List<String> pattern = List.of(
         "#########",
-        "####T####",
+        "#F##T##MN",
         "#SSSISSS#",
         "###SSS###",
         "#RU#C#PL#"
@@ -140,6 +140,24 @@ public final class MinionPanelConfig extends ConfigurationFile {
             XMaterial.GRAY_DYE,
             "<red>No tool equipped",
             "<gray>Click this slot while holding a tool."
+        ));
+        elements.put('F', element(
+            MinionPanelAction.FUEL_SLOT,
+            XMaterial.COAL,
+            "<red>No fuel",
+            "<gray>Click this slot while holding minion fuel."
+        ));
+        elements.put('M', element(
+            MinionPanelAction.FIRST_MODULE_SLOT,
+            XMaterial.LIGHT_GRAY_DYE,
+            "<red>No module",
+            "<gray>Click this slot while holding a minion module."
+        ));
+        elements.put('N', element(
+            MinionPanelAction.SECOND_MODULE_SLOT,
+            XMaterial.LIGHT_GRAY_DYE,
+            "<red>No module",
+            "<gray>Click this slot while holding a minion module."
         ));
         elements.put('S', element(
             MinionPanelAction.STORAGE_SLOT,

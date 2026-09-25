@@ -1,6 +1,8 @@
 package com.eternalcode.minions.gui;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.eternalcode.minions.addon.MinionAddonItems;
+import com.eternalcode.minions.addon.MinionAddonType;
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
 import com.eternalcode.minions.config.MessagesConfig;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -60,6 +63,7 @@ public final class MinionPanel implements Listener {
     private final MinionAccessGuard access;
     private final MinionItemTransferService transfers;
     private final MinionPickupService pickups;
+    private final MinionAddonItems addons;
     private final UpgradesOpener openUpgrades;
     private final BiFunction<Player, Minion, Optional<Minion>> linkChest;
 
@@ -75,6 +79,7 @@ public final class MinionPanel implements Listener {
         MinionAccessGuard access,
         MinionItemTransferService transfers,
         MinionPickupService pickups,
+        MinionAddonItems addons,
         UpgradesOpener openUpgrades,
         BiFunction<Player, Minion, Optional<Minion>> linkChest
     ) {
@@ -90,6 +95,7 @@ public final class MinionPanel implements Listener {
         this.access = access;
         this.transfers = transfers;
         this.pickups = pickups;
+        this.addons = addons;
         this.openUpgrades = openUpgrades;
         this.linkChest = linkChest;
     }
@@ -226,6 +232,18 @@ public final class MinionPanel implements Listener {
 
         GuiItem item = switch (element.action) {
             case TOOL_SLOT -> this.createToolElement(player, minion, element, placeholders, refresh);
+            case FUEL_SLOT -> this.createAddonElement(
+                    player, minion, element, placeholders, refresh,
+                    MinionAddonType.FUEL, MinionEquipment::fuel, MinionEquipment::withFuel
+            );
+            case FIRST_MODULE_SLOT -> this.createAddonElement(
+                    player, minion, element, placeholders, refresh,
+                    MinionAddonType.MODULE, MinionEquipment::firstModule, MinionEquipment::withFirstModule
+            );
+            case SECOND_MODULE_SLOT -> this.createAddonElement(
+                    player, minion, element, placeholders, refresh,
+                    MinionAddonType.MODULE, MinionEquipment::secondModule, MinionEquipment::withSecondModule
+            );
             case COLLECT_ITEMS -> this.createAccessibleElement(
                     player, minion, MinionAccessAction.MANAGE, element, placeholders,
                     current -> this.collect(player, current, refresh)
@@ -288,10 +306,56 @@ public final class MinionPanel implements Listener {
         ), this.plugin);
     }
 
+    private GuiItem createAddonElement(
+        Player player,
+        Minion minion,
+        MinionPanelElementConfig element,
+        Map<String, String> placeholders,
+        Consumer<Minion> refresh,
+        MinionAddonType type,
+        Function<MinionEquipment, ItemStack> slot,
+        BiFunction<MinionEquipment, ItemStack, MinionEquipment> replace
+    ) {
+        ItemStack current = slot.apply(minion.equipment());
+        ItemStack icon = current == null ? this.items.create(element, placeholders) : current;
+        return new GuiItem(icon, event -> this.withAccess(
+                player,
+                minion,
+                MinionAccessAction.MANAGE,
+                accessible -> this.updateAddon(player, accessible, event.getCursor(), type, slot, replace, refresh)
+        ), this.plugin);
+    }
+
+    private void updateAddon(
+        Player player,
+        Minion minion,
+        ItemStack cursor,
+        MinionAddonType type,
+        Function<MinionEquipment, ItemStack> slot,
+        BiFunction<MinionEquipment, ItemStack, MinionEquipment> replace,
+        Consumer<Minion> refresh
+    ) {
+        boolean emptyCursor = cursor == null || cursor.getType().isAir();
+        if (!emptyCursor && !this.addons.is(cursor, type)) {
+            this.send(player, this.messages.addonWrongSlot);
+            return;
+        }
+
+        ItemStack previous = slot.apply(minion.equipment());
+        if (emptyCursor && previous == null) {
+            return;
+        }
+
+        Minion updated = minion.withEquipment(replace.apply(minion.equipment(), emptyCursor ? null : cursor));
+        this.lifecycle.updateEquipment(updated);
+        player.setItemOnCursor(previous);
+        refresh.accept(updated);
+    }
+
     private void updateTool(Player player, Minion minion, ItemStack cursor, Consumer<Minion> refresh) {
         ItemStack currentTool = minion.equipment().tool();
         Minion updated = minion.withEquipment(
-                new MinionEquipment(cursor.getType().isAir() ? null : cursor)
+                minion.equipment().withTool(cursor.getType().isAir() ? null : cursor)
         );
         this.lifecycle.updateEquipment(updated);
         player.setItemOnCursor(currentTool);

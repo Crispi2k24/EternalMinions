@@ -22,8 +22,11 @@ public final class MinionAppearanceItems {
     }
 
     public ItemStack head(AbstractMinionConfig config) {
+        return this.head(resolveHeadTexture(config));
+    }
+
+    public ItemStack head(String texture) {
         ItemStack head = XMaterial.PLAYER_HEAD.parseItem();
-        String texture = resolveHeadTexture(config);
         if (texture.isEmpty()) {
             return head;
         }

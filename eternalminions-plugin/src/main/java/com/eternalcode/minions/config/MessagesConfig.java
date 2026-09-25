@@ -32,6 +32,9 @@ public final class MessagesConfig extends ConfigurationFile {
     public Notice minionPlacementBlocked = Notice.chat(prefix() + "<red>You cannot place a minion here.");
     public Notice blockPlacementBlockedByMinion = Notice.chat(prefix() + "<red>You cannot place a block on a minion.");
     public Notice minionTypeUnknown = Notice.chat(prefix() + "<red>Unknown minion type.");
+    public Notice addonReceived = Notice.chat(prefix() + "<green>Minion addon received.");
+    public Notice addonUnknown = Notice.chat(prefix() + "<red>Unknown minion addon.");
+    public Notice addonWrongSlot = Notice.chat(prefix() + "<red>This item does not fit into this slot.");
     public Notice minionLimitReached = Notice.chat(
         prefix() + "<red>You have reached your minion limit ({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})."
     );

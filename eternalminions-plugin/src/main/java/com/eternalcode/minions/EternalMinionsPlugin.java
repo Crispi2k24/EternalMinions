@@ -1,5 +1,7 @@
 package com.eternalcode.minions;
 
+import com.eternalcode.minions.addon.MinionAddonConfig;
+import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.bridge.BridgeManager;
 import com.eternalcode.minions.bridge.economy.MinionEconomyServiceImpl;
 import com.eternalcode.minions.bridge.shop.MinionShopServiceImpl;
@@ -111,6 +113,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 MinionsConfig.class,
                 MessagesConfig.class,
                 MinionPanelConfig.class,
+                MinionAddonConfig.class,
                 DatabaseConfig.class,
                 MinerConfig.class,
                 LumberjackConfig.class,
@@ -206,6 +209,8 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 events
         );
         MinionItemFactory minionItems = new MinionItemFactory(this, behaviors, appearance, miniMessage);
+        MinionAddonItems addonItems = new MinionAddonItems(
+                this, configs.get(MinionAddonConfig.class), appearance, miniMessage);
         MinionLifecycleService lifecycle = new MinionLifecycleService(
                 this.minions,
                 scheduler,
@@ -280,6 +285,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 access,
                 itemTransfers,
                 pickups,
+                addonItems,
                 upgradePanel::open,
                 chestLinks::toggle
         );
@@ -316,9 +322,10 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         };
         this.commands = LiteBukkitFactory.builder("eternalminions", this, this.getServer())
                 .argumentSuggestion(String.class, ArgumentKey.of("type"), SuggestionResult.of(behaviors.ids()))
+                .argumentSuggestion(String.class, ArgumentKey.of("addon"), SuggestionResult.of(addonItems.ids()))
                 .commands(
                         new ReloadCommand(reload, messages),
-                        new MinionGiveCommand(minionItems, behaviors, messages)
+                        new MinionGiveCommand(minionItems, addonItems, behaviors, messages)
                 )
                 .result(Notice.class, new NoticeResultHandler(notices))
                 .message(LiteBukkitMessages.PLAYER_NOT_FOUND, messages.playerNotFound)

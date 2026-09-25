@@ -1,5 +1,6 @@
 package com.eternalcode.minions.command;
 
+import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.config.MessagesConfig;
 import com.eternalcode.minions.item.MinionItemFactory;
 import com.eternalcode.minions.minion.behavior.MinionBehavior;
@@ -16,15 +17,18 @@ import org.bukkit.entity.Player;
 public final class MinionGiveCommand {
 
     private final MinionItemFactory items;
+    private final MinionAddonItems addons;
     private final MinionBehaviorRegistry behaviors;
     private final MessagesConfig messages;
 
     public MinionGiveCommand(
         MinionItemFactory items,
+        MinionAddonItems addons,
         MinionBehaviorRegistry behaviors,
         MessagesConfig messages
     ) {
         this.items = items;
+        this.addons = addons;
         this.behaviors = behaviors;
         this.messages = messages;
     }
@@ -49,6 +53,23 @@ public final class MinionGiveCommand {
             return this.messages.minionTypeUnknown;
         }
         return this.give(player, behavior, amount);
+    }
+
+    @Execute(name = "addon")
+    @Permission("eternalminions.command.give")
+    public Notice giveAddon(@Context Player player, @Arg("addon") String id) {
+        return this.giveAddon(player, id, 1);
+    }
+
+    @Execute(name = "addon")
+    @Permission("eternalminions.command.give")
+    public Notice giveAddon(@Context Player player, @Arg("addon") String id, @Arg("amount") int amount) {
+        return this.addons.create(id, amount)
+            .map(item -> {
+                player.getInventory().addItem(item);
+                return this.messages.addonReceived;
+            })
+            .orElse(this.messages.addonUnknown);
     }
 
     private Notice give(Player player, MinionBehavior behavior, int amount) {

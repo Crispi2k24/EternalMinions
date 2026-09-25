@@ -140,11 +140,18 @@ public final class MinionRepository extends AbstractRepositoryOrmLite {
     }
 
     private void insertEquipment(MinionData minion) throws Exception {
-        if (minion.serializedTool().length == 0) {
+        this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.TOOL, minion.serializedTool());
+        this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.FUEL, minion.serializedFuel());
+        this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.FIRST_MODULE, minion.serializedFirstModule());
+        this.insertEquipmentSlot(minion.id(), MinionEquipmentSlot.SECOND_MODULE, minion.serializedSecondModule());
+    }
+
+    private void insertEquipmentSlot(long minionId, MinionEquipmentSlot slot, byte[] serializedItem) throws Exception {
+        if (serializedItem.length == 0) {
             return;
         }
         this.databaseManager.getDao(MinionEquipmentTable.class).create(
-                new MinionEquipmentTable(minion.id(), MinionEquipmentSlot.TOOL.name(), minion.serializedTool())
+                new MinionEquipmentTable(minionId, slot.name(), serializedItem)
         );
     }
 

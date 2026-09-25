@@ -103,7 +103,9 @@ public final class MinionPlacementController implements Listener {
             new MinionPosition(target.getWorld().getKey().asString(), target.getX(), target.getY(), target.getZ()),
             state.map(stored -> new MinionProgress(stored.level(), stored.progress()))
                 .orElseGet(MinionProgress::start),
-            new MinionEquipment(state.map(MinionItemFactory.StoredMinionState::tool).orElse(null)),
+            state.map(stored -> new MinionEquipment(
+                    stored.tool(), stored.fuel(), stored.firstModule(), stored.secondModule()))
+                .orElseGet(MinionEquipment::empty),
             this.createStorage(state.orElse(null), behavior, upgrades),
             upgrades,
             null,
