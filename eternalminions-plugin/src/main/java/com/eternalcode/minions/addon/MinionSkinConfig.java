@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.eternalcode.minions.config.MinionItemsConfig;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
+import java.math.BigDecimal;
 import java.util.List;
 import org.bukkit.Color;
 
@@ -11,6 +12,9 @@ public final class MinionSkinConfig extends OkaeriConfig {
 
     public String displayName = "<green>Skin";
     public List<String> lore = List.of();
+
+    @Comment("Price paid from the minion upgrade economy. 0 makes the skin free.")
+    public BigDecimal price = new BigDecimal("50000");
 
     @Comment("Icon of the skin in the skin selection panel.")
     public XMaterial icon = XMaterial.LEATHER_CHESTPLATE;

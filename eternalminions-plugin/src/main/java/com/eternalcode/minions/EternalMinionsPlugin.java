@@ -5,6 +5,7 @@ import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.addon.MinionAnchorTickets;
 import com.eternalcode.minions.addon.MinionFuelService;
 import com.eternalcode.minions.addon.MinionModuleService;
+import com.eternalcode.minions.addon.MinionSkinShop;
 import com.eternalcode.minions.addon.MinionSkins;
 import com.eternalcode.minions.addon.MinionSkinsConfig;
 import com.eternalcode.minions.bridge.BridgeManager;
@@ -289,7 +290,11 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 lifecycle::updateSettings,
                 notices
         );
-        MinionSkinPanel skinPanel = new MinionSkinPanel(this, panelConfig, miniMessage, skins, access, lifecycle);
+        MinionSkinShop skinShop = new MinionSkinShop(
+                this, configs.get(MinionSkinsConfig.class), this.database.skinOwners(), economyService);
+        this.getServer().getPluginManager().registerEvents(skinShop, this);
+        MinionSkinPanel skinPanel = new MinionSkinPanel(
+                this, panelConfig, messages, notices, miniMessage, skins, skinShop, access, lifecycle);
         MinionPanel panel = new MinionPanel(
                 this,
                 panelConfig,
@@ -365,7 +370,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 1L
         );
 
-        this.restore(lifecycle);
+        this.restore(lifecycle, skinShop);
         EternalMinionsProvider.initialize(new EternalMinionsApiImpl(
                 queryApi,
                 managementApi,
@@ -380,7 +385,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         this.getLogger().info("EternalMinions initialized with renderer " + minionsConfig.minionRenderer + ".");
     }
 
-    private void restore(MinionLifecycleService lifecycle) {
+    private void restore(MinionLifecycleService lifecycle, MinionSkinShop skinShop) {
         this.database.initialize()
                 .thenCompose(ignored -> this.database.loadAll())
                 .whenComplete((loaded, error) -> {
@@ -399,6 +404,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                             this, () -> {
                                 int restored = lifecycle.restoreAll(loaded);
                                 this.getLogger().info("Loaded " + restored + " minions from database.");
+                                skinShop.loadOnlinePlayers();
                             });
                 });
     }

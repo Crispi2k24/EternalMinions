@@ -103,17 +103,18 @@ public final class MinionPanelConfig extends ConfigurationFile {
         "<gray>Wygląd zawodu minionka."
     );
 
-    @Comment("Lore appended to a skin the player owns.")
+    @Comment("Lore appended to a skin the player owns or got for free.")
     public List<String> skinOwnedLore = List.of("", "<yellow>Kliknij, aby założyć!");
 
     @Comment("Lore appended to the skin the minion wears.")
     public List<String> skinWornLore = List.of("", "<green>Minionek nosi ten wygląd.");
 
-    @Comment("Lore appended to a skin the player does not own.")
+    @Comment("Lore appended to a skin the player can buy. Placeholder: {SKIN_PRICE}.")
     public List<String> skinLockedLore = List.of(
         "",
-        "<red>Nie masz tego wyglądu.",
-        "<gray>Kupisz go w <aqua>/portfel<gray>."
+        "<gray>Cena: <yellow>{SKIN_PRICE}",
+        "",
+        "<yellow>Kliknij, aby kupić!"
     );
 
     @Comment("Lore appended to an upgrade icon that reached its maximum tier.")
@@ -259,7 +260,7 @@ public final class MinionPanelConfig extends ConfigurationFile {
             "<green>Wygląd",
             "<gray>Teraz: <aqua>{MINION_SKIN}",
             "",
-            "<gray>Skórki kupisz w <aqua>/portfel<gray>.",
+            "<gray>Nowe wyglądy kupisz tu za monety wyspy.",
             "",
             "<yellow>Kliknij, aby zmienić!"
         ));

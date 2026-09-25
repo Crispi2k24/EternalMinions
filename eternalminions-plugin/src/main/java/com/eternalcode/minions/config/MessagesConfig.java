@@ -54,6 +54,12 @@ public final class MessagesConfig extends ConfigurationFile {
 
     public Notice minionRotated = Notice.chat(prefix() + "<green>Minionek obrócony.");
 
+    public Notice skinPurchased = Notice.chat(
+        prefix() + "<green>Kupiłeś wygląd {SKIN}<green>. Możesz go zakładać na wszystkie swoje minionki."
+    );
+    public Notice skinCannotAfford = Notice.chat(prefix() + "<red>Nie stać cię na ten wygląd.");
+    public Notice skinNotReady = Notice.chat(prefix() + "<red>Wczytujemy twoje wyglądy, spróbuj za chwilę.");
+
     private static String prefix() {
         return "<white><bold>MINIONKI > </bold>";
     }

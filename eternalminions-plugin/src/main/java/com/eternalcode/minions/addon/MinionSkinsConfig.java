@@ -17,7 +17,7 @@ public final class MinionSkinsConfig extends ConfigurationFile {
 
     @Comment({
         "Permission that unlocks a skin is this prefix followed by the skin id,",
-        "e.g. eternalminions.skin.zloty. A skin is picked by the player managing the minion."
+        "e.g. eternalminions.skin.zloty - it gives the skin for free, without buying it."
     })
     public String permissionPrefix = "eternalminions.skin.";
 

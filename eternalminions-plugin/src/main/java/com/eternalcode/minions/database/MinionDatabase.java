@@ -1,5 +1,6 @@
 package com.eternalcode.minions.database;
 
+import com.eternalcode.minions.addon.MinionSkinOwnerRepository;
 import com.eternalcode.minions.database.repository.MinionEquipmentRepository;
 import com.eternalcode.minions.database.repository.MinionActionRepository;
 import com.eternalcode.minions.database.repository.MinionRepository;
@@ -26,6 +27,7 @@ public final class MinionDatabase {
     private final MinionStorageRepository storage;
     private final MinionUpgradeRepository upgrades;
     private final MinionChestLinkRepository chestLinks;
+    private final MinionSkinOwnerRepository skinOwners;
     private final MinionPersistenceService persistence;
 
     private MinionDatabase(
@@ -39,6 +41,7 @@ public final class MinionDatabase {
             MinionStorageRepository storage,
             MinionUpgradeRepository upgrades,
             MinionChestLinkRepository chestLinks,
+            MinionSkinOwnerRepository skinOwners,
             MinionPersistenceService persistence
     ) {
         this.logger = logger;
@@ -51,6 +54,7 @@ public final class MinionDatabase {
         this.storage = storage;
         this.upgrades = upgrades;
         this.chestLinks = chestLinks;
+        this.skinOwners = skinOwners;
         this.persistence = persistence;
     }
 
@@ -65,6 +69,7 @@ public final class MinionDatabase {
         MinionUpgradeRepository upgrades = new MinionUpgradeRepository(manager, scheduler);
         MinionChestLinkRepository chestLinks = new MinionChestLinkRepository(manager, scheduler);
         MinionActionRepository actions = new MinionActionRepository(manager, scheduler);
+        MinionSkinOwnerRepository skinOwners = new MinionSkinOwnerRepository(manager, scheduler);
         MinionPersistenceService persistence = new MinionPersistenceService(
                 logger,
                 minions,
@@ -87,12 +92,17 @@ public final class MinionDatabase {
                 storage,
                 upgrades,
                 chestLinks,
+                skinOwners,
                 persistence
         );
     }
 
     public MinionPersistenceService persistence() {
         return this.persistence;
+    }
+
+    public MinionSkinOwnerRepository skinOwners() {
+        return this.skinOwners;
     }
 
     public CompletableFuture<Void> initialize() {
@@ -106,6 +116,7 @@ public final class MinionDatabase {
                 .thenCompose(ignored -> this.storage.initialize())
                 .thenCompose(ignored -> this.upgrades.initialize())
                 .thenCompose(ignored -> this.chestLinks.initialize())
+                .thenCompose(ignored -> this.skinOwners.initialize())
                 .thenRun(this.minions::markReady);
     }
 

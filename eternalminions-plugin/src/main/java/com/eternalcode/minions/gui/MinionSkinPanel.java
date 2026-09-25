@@ -2,12 +2,16 @@ package com.eternalcode.minions.gui;
 
 import com.eternalcode.minions.access.MinionAccessAction;
 import com.eternalcode.minions.addon.MinionSkinConfig;
+import com.eternalcode.minions.addon.MinionSkinShop;
 import com.eternalcode.minions.addon.MinionSkins;
+import com.eternalcode.minions.config.MessagesConfig;
 import com.eternalcode.minions.config.MinionPanelAction;
 import com.eternalcode.minions.config.MinionPanelElementConfig;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.MinionLifecycleService;
 import com.eternalcode.minions.minion.access.MinionAccessGuard;
+import com.eternalcode.minions.notice.NoticeService;
+import com.eternalcode.multification.notice.Notice;
 import com.github.stefvanschie.inventoryframework.adventuresupport.ComponentHolder;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -30,8 +34,11 @@ public final class MinionSkinPanel {
 
     private final Plugin plugin;
     private final MinionPanelConfig config;
+    private final MessagesConfig messages;
+    private final NoticeService notices;
     private final MiniMessage miniMessage;
     private final MinionSkins skins;
+    private final MinionSkinShop shop;
     private final MinionAccessGuard access;
     private final MinionLifecycleService lifecycle;
     private final PanelItemFactory items;
@@ -39,15 +46,21 @@ public final class MinionSkinPanel {
     public MinionSkinPanel(
         Plugin plugin,
         MinionPanelConfig config,
+        MessagesConfig messages,
+        NoticeService notices,
         MiniMessage miniMessage,
         MinionSkins skins,
+        MinionSkinShop shop,
         MinionAccessGuard access,
         MinionLifecycleService lifecycle
     ) {
         this.plugin = plugin;
         this.config = config;
+        this.messages = messages;
+        this.notices = notices;
         this.miniMessage = miniMessage;
         this.skins = skins;
+        this.shop = shop;
         this.access = access;
         this.lifecycle = lifecycle;
         this.items = new PanelItemFactory(miniMessage);
@@ -75,47 +88,50 @@ public final class MinionSkinPanel {
 
         StaticPane pane = new StaticPane(COLUMNS, rows);
         gui.addPane(Slot.fromIndex(0), pane);
-        this.populate(gui, pane, player, minion, back, rows);
+        this.populate(new View(gui, pane, player, back, rows), minion);
         gui.show(player);
     }
 
-    private void populate(ChestGui gui, StaticPane pane, Player player, Minion minion, Runnable back, int rows) {
-        pane.clear();
-        int capacity = (rows - 1) * COLUMNS;
+    private void populate(View view, Minion minion) {
+        view.pane().clear();
+        int capacity = (view.rows() - 1) * COLUMNS;
 
-        pane.addItem(this.skinItem(gui, pane, player, minion, back, rows, null, this.config.skinDefault, true), 0, 0);
+        view.pane().addItem(this.skinItem(view, minion, null, this.config.skinDefault, true, Map.of()), 0, 0);
         int index = 1;
         for (Map.Entry<String, MinionSkinConfig> entry : this.skins.config().skins.entrySet()) {
             if (index >= capacity) {
                 break;
             }
-            MinionPanelElementConfig icon = icon(entry.getValue());
-            boolean owned = this.skins.owns(player, entry.getKey());
-            pane.addItem(
-                this.skinItem(gui, pane, player, minion, back, rows, entry.getKey(), icon, owned),
+            boolean owned = this.shop.owns(view.player(), entry.getKey());
+            view.pane().addItem(
+                this.skinItem(
+                    view,
+                    minion,
+                    entry.getKey(),
+                    icon(entry.getValue()),
+                    owned,
+                    Map.of("{SKIN_PRICE}", this.shop.price(entry.getValue()))
+                ),
                 index % COLUMNS,
                 index / COLUMNS
             );
             index++;
         }
 
-        pane.addItem(new GuiItem(
+        view.pane().addItem(new GuiItem(
             this.items.create(this.config.upgradesBack, Map.of()),
-            event -> back.run(),
+            event -> view.back().run(),
             this.plugin
-        ), BACK_COLUMN, rows - 1);
+        ), BACK_COLUMN, view.rows() - 1);
     }
 
     private GuiItem skinItem(
-        ChestGui gui,
-        StaticPane pane,
-        Player player,
+        View view,
         Minion minion,
-        Runnable back,
-        int rows,
         String skinId,
         MinionPanelElementConfig icon,
-        boolean owned
+        boolean owned,
+        Map<String, String> placeholders
     ) {
         boolean wearing = Objects.equals(minion.equipment().skinId(), skinId);
         List<String> lore = new ArrayList<>(icon.lore);
@@ -123,17 +139,41 @@ public final class MinionSkinPanel {
 
         MinionPanelElementConfig shown = copy(icon);
         shown.glowing = wearing;
-        return new GuiItem(this.items.create(shown, lore, Map.of()), event -> {
-            if (wearing || !owned) {
+        return new GuiItem(this.items.create(shown, lore, placeholders), event -> {
+            if (wearing) {
                 return;
             }
-            this.access.findAccessible(player, minion.id(), MinionAccessAction.MANAGE).ifPresent(current -> {
+            if (!owned && !this.buy(view.player(), skinId, icon.displayName)) {
+                return;
+            }
+            this.access.findAccessible(view.player(), minion.id(), MinionAccessAction.MANAGE).ifPresent(current -> {
                 Minion updated = current.withEquipment(current.equipment().withSkin(skinId));
-                this.lifecycle.updateSkin(updated, player.getUniqueId());
-                this.populate(gui, pane, player, updated, back, rows);
-                gui.update();
+                this.lifecycle.updateSkin(updated, view.player().getUniqueId());
+                this.populate(view, updated);
+                view.gui().update();
             });
         }, this.plugin);
+    }
+
+    private boolean buy(Player player, String skinId, String skinName) {
+        return switch (this.shop.purchase(player, skinId)) {
+            case PURCHASED -> {
+                this.notices.create()
+                    .viewer(player)
+                    .notice(this.messages.skinPurchased)
+                    .placeholder("{SKIN}", skinName)
+                    .send();
+                yield true;
+            }
+            case TOO_POOR -> this.refuse(player, this.messages.skinCannotAfford);
+            case NOT_READY -> this.refuse(player, this.messages.skinNotReady);
+            case UNKNOWN -> false;
+        };
+    }
+
+    private boolean refuse(Player player, Notice notice) {
+        this.notices.create().viewer(player).notice(notice).send();
+        return false;
     }
 
     private static MinionPanelElementConfig icon(MinionSkinConfig skin) {
@@ -156,5 +196,8 @@ public final class MinionSkinPanel {
         copy.customModelData = source.customModelData;
         copy.hideTooltip = source.hideTooltip;
         return copy;
+    }
+
+    private record View(ChestGui gui, StaticPane pane, Player player, Runnable back, int rows) {
     }
 }
