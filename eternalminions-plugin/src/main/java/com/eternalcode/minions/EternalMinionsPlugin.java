@@ -238,7 +238,7 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 statusTracker
         );
         MinionBehaviorServiceImpl behaviorApi = new MinionBehaviorServiceImpl(behaviors);
-        MinionItemServiceImpl itemApi = new MinionItemServiceImpl(minionItems, behaviors, this.minions);
+        MinionItemServiceImpl itemApi = new MinionItemServiceImpl(minionItems, behaviors, this.minions, addonItems);
         MinionStatusServiceImpl statusApi = new MinionStatusServiceImpl(this.minions, statusTracker, events);
 
         MinionPickupService pickups = new MinionPickupService(

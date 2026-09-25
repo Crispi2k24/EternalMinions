@@ -19,4 +19,8 @@ public interface MinionItemService {
 
     /** Reads portable state from a minion item without modifying it. */
     @NotNull Optional<MinionItemSnapshot> inspect(@NotNull ItemStack item);
+
+    @NotNull Optional<ItemStack> createAddon(@NotNull String addonId, int amount);
+
+    @NotNull Optional<ItemStack> createCompressed(@NotNull String material, int amount);
 }

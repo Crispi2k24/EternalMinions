@@ -72,6 +72,12 @@ public final class MinionGiveCommand {
             .orElse(this.messages.addonUnknown);
     }
 
+    @Execute(name = "addon")
+    @Permission("eternalminions.command.give")
+    public Notice giveAddon(@Arg("addon") String id, @Arg("amount") int amount, @Arg("player") Player target) {
+        return this.giveAddon(target, id, amount);
+    }
+
     private Notice give(Player player, MinionBehavior behavior, int amount) {
         player.getInventory().addItem(this.items.create(behavior, amount));
         return this.messages.minionItemReceived;

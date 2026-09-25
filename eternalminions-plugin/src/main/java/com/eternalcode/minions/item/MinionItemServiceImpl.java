@@ -1,5 +1,7 @@
 package com.eternalcode.minions.item;
 
+import com.cryptomorin.xseries.XMaterial;
+import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.minion.behavior.MinionBehaviorRegistry;
 import com.eternalcode.minions.minion.MinionId;
 import com.eternalcode.minions.minion.MinionRegistry;
@@ -16,15 +18,18 @@ public final class MinionItemServiceImpl implements MinionItemService {
     private final MinionItemFactory items;
     private final MinionBehaviorRegistry behaviors;
     private final MinionRegistry minions;
+    private final MinionAddonItems addons;
 
     public MinionItemServiceImpl(
         MinionItemFactory items,
         MinionBehaviorRegistry behaviors,
-        MinionRegistry minions
+        MinionRegistry minions,
+        MinionAddonItems addons
     ) {
         this.items = items;
         this.behaviors = behaviors;
         this.minions = minions;
+        this.addons = addons;
     }
 
     @Override
@@ -45,6 +50,16 @@ public final class MinionItemServiceImpl implements MinionItemService {
     @Override
     public Optional<MinionItemSnapshot> inspect(ItemStack item) {
         return this.items.readState(item).map(this::map);
+    }
+
+    @Override
+    public Optional<ItemStack> createAddon(String addonId, int amount) {
+        return this.addons.create(addonId, amount);
+    }
+
+    @Override
+    public Optional<ItemStack> createCompressed(String material, int amount) {
+        return XMaterial.matchXMaterial(material).flatMap(match -> this.addons.createCompressed(match, amount));
     }
 
     private MinionItemSnapshot map(MinionItemFactory.StoredMinionState state) {
