@@ -22,6 +22,7 @@ public final class MinionAddonItems {
     private final MinionAppearanceItems appearance;
     private final MiniMessage miniMessage;
     private final NamespacedKey addonKey;
+    private final NamespacedKey compressedKey;
 
     public MinionAddonItems(
         Plugin plugin,
@@ -33,10 +34,24 @@ public final class MinionAddonItems {
         this.appearance = appearance;
         this.miniMessage = miniMessage;
         this.addonKey = new NamespacedKey(plugin, "minion_addon");
+        this.compressedKey = new NamespacedKey(plugin, "minion_compressed");
     }
 
     public Optional<ItemStack> create(String id, int amount) {
         return this.config.find(id).map(addon -> this.create(addon, amount));
+    }
+
+    public Optional<ItemStack> createCompressed(XMaterial material, int amount) {
+        MinionAddonItemConfig definition = this.config.compressedItems.get(material);
+        if (definition == null) {
+            return Optional.empty();
+        }
+
+        ItemStack item = this.build(definition, amount);
+        ItemMeta meta = item.getItemMeta();
+        meta.getPersistentDataContainer().set(this.compressedKey, PersistentDataType.STRING, material.name());
+        item.setItemMeta(meta);
+        return Optional.of(item);
     }
 
     public Optional<MinionAddon> read(ItemStack item) {
@@ -77,7 +92,18 @@ public final class MinionAddonItems {
     }
 
     private ItemStack create(MinionAddon addon, int amount) {
-        MinionAddonItemConfig definition = this.config.find(addon).orElseThrow();
+        ItemStack item = this.build(this.config.find(addon).orElseThrow(), amount);
+        ItemMeta meta = item.getItemMeta();
+        meta.getPersistentDataContainer().set(
+            this.addonKey,
+            PersistentDataType.STRING,
+            addon.type().name() + SEPARATOR + addon.id()
+        );
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack build(MinionAddonItemConfig definition, int amount) {
         ItemStack item = definition.material == XMaterial.PLAYER_HEAD
             ? this.appearance.head(definition.headTexture)
             : definition.material.parseItem();
@@ -99,11 +125,6 @@ public final class MinionAddonItems {
             customModelData.setFloats(List.of((float) definition.customModelData));
             meta.setCustomModelDataComponent(customModelData);
         }
-        meta.getPersistentDataContainer().set(
-            this.addonKey,
-            PersistentDataType.STRING,
-            addon.type().name() + SEPARATOR + addon.id()
-        );
         item.setItemMeta(meta);
         return item;
     }

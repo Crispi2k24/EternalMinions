@@ -4,6 +4,7 @@ import com.eternalcode.minions.addon.MinionAddonConfig;
 import com.eternalcode.minions.addon.MinionAddonItems;
 import com.eternalcode.minions.addon.MinionAnchorTickets;
 import com.eternalcode.minions.addon.MinionFuelService;
+import com.eternalcode.minions.addon.MinionModuleService;
 import com.eternalcode.minions.bridge.BridgeManager;
 import com.eternalcode.minions.bridge.economy.MinionEconomyServiceImpl;
 import com.eternalcode.minions.bridge.shop.MinionShopServiceImpl;
@@ -135,13 +136,11 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         MiniMessage miniMessage = MiniMessage.miniMessage();
         NoticeService notices = new NoticeService(messages, miniMessage);
         MinionBehaviorRegistry behaviors = new MinionBehaviorRegistry();
-        MinionItemTransferService itemTransfers = new MinionItemTransferService(minionsConfig);
-        MinionToolService tools = new MinionToolService(
-                new ToolValidationService(),
-                new ToolDurabilityService(),
-                new ToolInventoryLocator(),
-                itemTransfers
-        );
+        MinionAppearanceItems appearance = new MinionAppearanceItems(this.getServer());
+        MinionAddonConfig addonConfig = configs.get(MinionAddonConfig.class);
+        MinionAddonItems addonItems = new MinionAddonItems(this, addonConfig, appearance, miniMessage);
+        MinionFuelService fuels = new MinionFuelService(addonConfig, addonItems);
+        MinionAnchorTickets anchors = new MinionAnchorTickets(this, fuels);
         KillerLootingListener killerLooting = new KillerLootingListener();
         SellerConfig sellerConfig = configs.get(SellerConfig.class);
 
@@ -158,6 +157,15 @@ public final class EternalMinionsPlugin extends JavaPlugin {
         MinionEconomyServiceImpl economyService = new MinionEconomyServiceImpl(this.getLogger(), economy);
         this.getServer().getPluginManager().registerEvents(economyService, this);
         this.getServer().getPluginManager().registerEvents(killerLooting, this);
+        MinionModuleService modules =
+                new MinionModuleService(this.getServer(), addonConfig, addonItems, this.shopService);
+        MinionItemTransferService itemTransfers = new MinionItemTransferService(minionsConfig, modules);
+        MinionToolService tools = new MinionToolService(
+                new ToolValidationService(),
+                new ToolDurabilityService(),
+                new ToolInventoryLocator(),
+                itemTransfers
+        );
 
         behaviors.replace(MinionBehaviorRegistry.createEnabled(
                 configs,
@@ -167,7 +175,6 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                 this.shopService
         ));
 
-        MinionAppearanceItems appearance = new MinionAppearanceItems(this.getServer());
         this.minions = new MinionRegistry();
         PlayerMinionLimitService playerLimits = new PlayerMinionLimitService(this.minions, minionsConfig.limits);
         this.minionAccess = new MinionAccessServiceImpl(this.getLogger());
@@ -198,10 +205,6 @@ public final class EternalMinionsPlugin extends JavaPlugin {
                         new ProximityActivityRule(minionsConfig.activity.proximity)
                 )
         );
-        MinionAddonConfig addonConfig = configs.get(MinionAddonConfig.class);
-        MinionAddonItems addonItems = new MinionAddonItems(this, addonConfig, appearance, miniMessage);
-        MinionFuelService fuels = new MinionFuelService(addonConfig, addonItems);
-        MinionAnchorTickets anchors = new MinionAnchorTickets(this, fuels);
         EventDispatcher events = new EventDispatcher(this.getServer());
         MinionScheduler scheduler = new MinionScheduler(
                 this.getServer(),

@@ -1,5 +1,6 @@
 package com.eternalcode.minions.minion.storage;
 
+import com.eternalcode.minions.addon.MinionModuleService;
 import com.eternalcode.minions.config.MinionsConfig;
 import com.eternalcode.minions.minion.Minion;
 import com.eternalcode.minions.minion.behavior.MinionContext;
@@ -16,12 +17,14 @@ import org.bukkit.inventory.ItemStack;
 public final class MinionItemTransferService {
 
     private final MinionsConfig config;
+    private final MinionModuleService modules;
 
-    public MinionItemTransferService(MinionsConfig config) {
-        if (config == null) {
-            throw new IllegalArgumentException("Minions config is required");
+    public MinionItemTransferService(MinionsConfig config, MinionModuleService modules) {
+        if (config == null || modules == null) {
+            throw new IllegalArgumentException("Minions config and module service are required");
         }
         this.config = config;
+        this.modules = modules;
     }
 
     public boolean canStoreAll(
@@ -33,6 +36,9 @@ public final class MinionItemTransferService {
             throw new IllegalArgumentException("Context, storage and items are required");
         }
         if (this.config.dropOverflowItems || !context.policy().storageAllowed()) {
+            return true;
+        }
+        if (this.modules.sellsOverflow(context.minion())) {
             return true;
         }
 
@@ -106,9 +112,10 @@ public final class MinionItemTransferService {
         }
 
         // Same loot, fewer entities. The server tick sends its regards.
-        Collection<ItemStack> combinedItems = MinionItemStacks.requiresCombine(items)
-                ? MinionItemStacks.combine(items)
-                : items;
+        List<ItemStack> incoming = this.modules.processIncoming(minion, items);
+        Collection<ItemStack> combinedItems = MinionItemStacks.requiresCombine(incoming)
+                ? MinionItemStacks.combine(incoming)
+                : incoming;
         MinionStorage storage = minion.storage();
         List<ItemStack> overflow = null;
 
@@ -127,6 +134,15 @@ public final class MinionItemTransferService {
                 overflow.add(remaining);
             }
         }
+
+        storage = this.modules.compact(minion, storage);
+        if (context.policy().storageAllowed()) {
+            Container chest = context.linkedChest();
+            if (chest != null) {
+                this.modules.compact(minion, chest.getInventory());
+            }
+        }
+        overflow = this.modules.sellOverflow(minion, overflow);
 
         if (this.config.dropOverflowItems) {
             this.dropOverflow(context, overflowLocation, overflow);

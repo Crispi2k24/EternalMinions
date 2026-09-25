@@ -5,6 +5,7 @@ import com.eternalcode.minions.config.ConfigurationFile;
 import eu.okaeri.configs.annotation.Comment;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,18 +22,31 @@ public final class MinionAddonConfig extends ConfigurationFile {
     })
     public Map<String, MinionFuelConfig> fuels = defaultFuels();
 
-    @Comment("Items accepted by the two module slots of the minion panel, keyed by id.")
-    public Map<String, MinionAddonItemConfig> modules = defaultModules();
+    @Comment({
+        "Items accepted by the two module slots of the minion panel, keyed by id.",
+        "Two modules with the same effect do not stack."
+    })
+    public Map<String, MinionModuleConfig> modules = defaultModules();
+
+    @Comment("How many items the SUPER_COMPACT module turns into one compressed item.")
+    public int compressAmount = 160;
+
+    @Comment("Compressed items made by the SUPER_COMPACT module, keyed by the material they are made of.")
+    public Map<XMaterial, MinionAddonItemConfig> compressedItems = defaultCompressedItems();
 
     public Optional<MinionAddonItemConfig> find(MinionAddon addon) {
         if (addon.type() == MinionAddonType.FUEL) {
             return this.fuel(addon.id()).map(fuel -> fuel.item);
         }
-        return Optional.ofNullable(this.modules.get(addon.id()));
+        return this.module(addon.id()).map(module -> module.item);
     }
 
     public Optional<MinionFuelConfig> fuel(String id) {
         return Optional.ofNullable(this.fuels.get(id));
+    }
+
+    public Optional<MinionModuleConfig> module(String id) {
+        return Optional.ofNullable(this.modules.get(id));
     }
 
     public Optional<MinionAddon> find(String id) {
@@ -80,25 +94,66 @@ public final class MinionAddonConfig extends ConfigurationFile {
         return fuels;
     }
 
-    private static Map<String, MinionAddonItemConfig> defaultModules() {
-        Map<String, MinionAddonItemConfig> modules = new LinkedHashMap<>();
-        modules.put("piec", module(XMaterial.BLAST_FURNACE, false, "<green>Piec hutniczy",
-            "<gray>Przetapia łup: rudy na sztabki,",
-            "<gray>bruk na kamień, drewno na węgiel."));
-        modules.put("kompresor", module(XMaterial.PISTON, false, "<green>Kompresor",
-            "<gray>Zamienia <aqua>9 <gray>sztabek albo węgla w blok."));
-        modules.put("zageszczacz", module(XMaterial.STICKY_PISTON, false, "<green>Zagęszczacz",
+    private static Map<String, MinionModuleConfig> defaultModules() {
+        Map<String, MinionModuleConfig> modules = new LinkedHashMap<>();
+        modules.put("piec", MinionModuleConfig.of(module(XMaterial.BLAST_FURNACE, false, "<green>Piec hutniczy",
+            "<gray>Przetapia łup jak piec: rudy na",
+            "<gray>sztabki, bruk na kamień, drewno na węgiel."), MinionModuleEffect.SMELT));
+        modules.put("kompresor", MinionModuleConfig.of(module(XMaterial.PISTON, false, "<green>Kompresor",
+            "<gray>Zamienia <aqua>9 <gray>przedmiotów w ich blok,",
+            "<gray>np. sztabki żelaza w blok żelaza."), MinionModuleEffect.COMPACT));
+        modules.put("zageszczacz", MinionModuleConfig.of(module(XMaterial.STICKY_PISTON, false, "<green>Zagęszczacz",
             "<gray>Zamienia <aqua>160 <gray>surowca w jego",
-            "<gray>zagęszczoną wersję do receptur."));
-        modules.put("sito", module(XMaterial.SCAFFOLDING, false, "<green>Sito",
-            "<gray>Daje szansę na dodatkowy przedmiot."));
-        modules.put("lej", module(XMaterial.HOPPER, false, "<green>Lej sprzedażowy",
-            "<gray>Gdy magazyn i skrzynia są pełne,",
-            "<gray>sprzedaje nadmiar za <aqua>50% <gray>ceny sklepu."));
-        modules.put("zloty_lej", module(XMaterial.HOPPER, true, "<green>Złoty lej",
-            "<gray>Gdy magazyn i skrzynia są pełne,",
-            "<gray>sprzedaje nadmiar za <aqua>80% <gray>ceny sklepu."));
+            "<gray>zagęszczoną wersję do receptur."), MinionModuleEffect.SUPER_COMPACT));
+        MinionModuleConfig sieve = MinionModuleConfig.of(module(XMaterial.SCAFFOLDING, false, "<green>Sito",
+            "<gray>Przy każdej pracy daje szansę",
+            "<gray>na dodatkowy przedmiot."), MinionModuleEffect.BONUS_DROPS);
+        sieve.bonusDrops = List.of(
+            MinionBonusDropConfig.of(XMaterial.IRON_NUGGET, 1, 5.0D),
+            MinionBonusDropConfig.of(XMaterial.GOLD_NUGGET, 1, 2.0D),
+            MinionBonusDropConfig.of(XMaterial.DIAMOND, 1, 0.1D)
+        );
+        modules.put("sito", sieve);
+        MinionModuleConfig hopper = MinionModuleConfig.of(module(XMaterial.HOPPER, false, "<green>Lej sprzedażowy",
+            "<gray>Gdy skrzynia i magazyn są pełne,",
+            "<gray>sprzedaje nadmiar za <aqua>50% <gray>ceny sklepu."), MinionModuleEffect.SELL_OVERFLOW);
+        hopper.sellPercent = 50;
+        modules.put("lej", hopper);
+        MinionModuleConfig goldenHopper = MinionModuleConfig.of(module(XMaterial.HOPPER, true, "<green>Złoty lej",
+            "<gray>Gdy skrzynia i magazyn są pełne,",
+            "<gray>sprzedaje nadmiar za <aqua>80% <gray>ceny sklepu."), MinionModuleEffect.SELL_OVERFLOW);
+        goldenHopper.sellPercent = 80;
+        modules.put("zloty_lej", goldenHopper);
         return modules;
+    }
+
+    private static Map<XMaterial, MinionAddonItemConfig> defaultCompressedItems() {
+        Map<XMaterial, MinionAddonItemConfig> items = new LinkedHashMap<>();
+        items.put(XMaterial.COBBLESTONE, compressed(XMaterial.COBBLESTONE, "Zagęszczony bruk"));
+        items.put(XMaterial.STONE, compressed(XMaterial.STONE, "Zagęszczony kamień"));
+        items.put(XMaterial.GRAVEL, compressed(XMaterial.GRAVEL, "Zagęszczony żwir"));
+        items.put(XMaterial.COAL, compressed(XMaterial.COAL, "Zagęszczony węgiel"));
+        items.put(XMaterial.IRON_INGOT, compressed(XMaterial.IRON_INGOT, "Zagęszczone żelazo"));
+        items.put(XMaterial.GOLD_INGOT, compressed(XMaterial.GOLD_INGOT, "Zagęszczone złoto"));
+        items.put(XMaterial.REDSTONE, compressed(XMaterial.REDSTONE, "Zagęszczony redstone"));
+        items.put(XMaterial.LAPIS_LAZULI, compressed(XMaterial.LAPIS_LAZULI, "Zagęszczony lapis"));
+        items.put(XMaterial.DIAMOND, compressed(XMaterial.DIAMOND, "Zagęszczony diament"));
+        items.put(XMaterial.EMERALD, compressed(XMaterial.EMERALD, "Zagęszczony szmaragd"));
+        items.put(XMaterial.OBSIDIAN, compressed(XMaterial.OBSIDIAN, "Zagęszczony obsydian"));
+        items.put(XMaterial.GLASS, compressed(XMaterial.GLASS, "Zagęszczone szkło"));
+        items.put(XMaterial.OAK_LOG, compressed(XMaterial.OAK_LOG, "Zagęszczone drewno"));
+        items.put(XMaterial.WHEAT, compressed(XMaterial.WHEAT, "Zagęszczona pszenica"));
+        items.put(XMaterial.SUGAR_CANE, compressed(XMaterial.SUGAR_CANE, "Zagęszczona trzcina"));
+        items.put(XMaterial.PAPER, compressed(XMaterial.PAPER, "Zagęszczony papier"));
+        return items;
+    }
+
+    private static MinionAddonItemConfig compressed(XMaterial material, String name) {
+        return MinionAddonItemConfig.of(material, true, "<green>" + name,
+            "<dark_gray>Surowiec do receptur",
+            "",
+            "<gray>Powstaje w minionku z modułem",
+            "<aqua>Zagęszczacz<gray>.");
     }
 
     private static MinionAddonItemConfig fuel(XMaterial material, boolean glowing, String name, String... effect) {
