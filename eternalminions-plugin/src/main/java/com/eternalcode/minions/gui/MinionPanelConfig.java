@@ -98,9 +98,9 @@ public final class MinionPanelConfig extends ConfigurationFile {
     @Comment("Icon of the profession's own look in the skin selection panel.")
     public MinionPanelElementConfig skinDefault = element(
         MinionPanelAction.NONE,
-        XMaterial.ARMOR_STAND,
+        XMaterial.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE,
         "<green>Domyślny wygląd",
-        "<gray>Wygląd zawodu minionka."
+        "<gray>Podstawowy wzór zbroi minionka."
     );
 
     @Comment("Lore appended to a skin the player owns or got for free.")
