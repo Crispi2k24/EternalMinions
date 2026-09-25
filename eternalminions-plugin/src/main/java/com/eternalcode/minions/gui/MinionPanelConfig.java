@@ -20,44 +20,45 @@ public final class MinionPanelConfig extends ConfigurationFile {
     }
 
     @Comment("Text displayed instead of a value when a minion reached its maximum level.")
-    public String maximumValue = "MAX";
+    public String maximumValue = "MAKS";
 
     @Comment("Title supports MiniMessage and minion placeholders.")
-    public String title = "<dark_gray>Minion <green>#{MINION_ID}";
+    public String title = "Minionek {MINION_BEHAVIOR}";
 
     @Comment("Each row contains exactly 9 symbols. The number of rows defines the inventory size.")
     public List<String> pattern = List.of(
+        "#F##I##MN",
+        "SSSSSSSSS",
+        "SSSSSSSSS",
+        "SSSSSSSSS",
         "#########",
-        "#F##T##MN",
-        "#SSSISSS#",
-        "###SSS###",
-        "#RU#C#PL#"
+        "#T#RCL#UP"
     );
 
     @Comment("Inventory slot occupied by the profession usage instructions.")
-    public int usageInstructionsSlot = 4;
+    public int usageInstructionsSlot = 45;
 
     @Comment("Status texts used by the {MINION_CHEST} placeholder.")
-    public String chestLinkedStatus = "Linked";
-    public String chestNotLinkedStatus = "Not linked";
+    public String chestLinkedStatus = "<green>podłączona";
+    public String chestNotLinkedStatus = "<gray>brak";
 
     @Comment("Texts used by the {MINION_DIRECTION} placeholder.")
-    public String directionSouth = "South";
-    public String directionWest = "West";
-    public String directionNorth = "North";
-    public String directionEast = "East";
+    public String directionSouth = "południe";
+    public String directionWest = "zachód";
+    public String directionNorth = "północ";
+    public String directionEast = "wschód";
 
     @Comment({
         "Texts used by the {MINION_FUEL_TIME} placeholder - the working time left in the fuel slot.",
         "Placeholders: {HOURS}, {MINUTES}, {TOTAL_MINUTES}."
     })
-    public String fuelNoneText = "none";
-    public String fuelUnlimitedText = "unlimited";
+    public String fuelNoneText = "brak";
+    public String fuelUnlimitedText = "bez limitu";
     public String fuelMinutesFormat = "{TOTAL_MINUTES} min";
     public String fuelHoursFormat = "{HOURS} h {MINUTES} min";
 
     @Comment("Title of the upgrades panel. Supports MiniMessage and minion placeholders.")
-    public String upgradesTitle = "<dark_gray>Minion Upgrades";
+    public String upgradesTitle = "Minionek - ulepszenia";
 
     @Comment({
         "Icons of the upgrades panel, one per upgrade kind.",
@@ -71,9 +72,10 @@ public final class MinionPanelConfig extends ConfigurationFile {
         "Placeholders: {UPGRADE_REQUIRED_LEVEL}, {UPGRADE_COST}."
     })
     public List<String> upgradeAvailableLore = List.of(
-        "<gray>Required minion level: <white>{UPGRADE_REQUIRED_LEVEL}",
-        "<gray>Cost: <green>{UPGRADE_COST}",
-        "<green>Click to upgrade."
+        "<gray>Wymagany poziom: <gold>{UPGRADE_REQUIRED_LEVEL}",
+        "<gray>Koszt: <yellow>{UPGRADE_COST}",
+        "",
+        "<yellow>Kliknij, aby ulepszyć!"
     );
 
     @Comment({
@@ -83,13 +85,13 @@ public final class MinionPanelConfig extends ConfigurationFile {
     public MinionPanelElementConfig upgradesBack = element(
         MinionPanelAction.NONE,
         XMaterial.ARROW,
-        "<yellow>Back",
-        "<gray>Return to the minion panel."
+        "<yellow>Powrót",
+        "<gray>Wróć do panelu minionka."
     );
 
     @Comment("Lore appended to an upgrade icon that reached its maximum tier.")
     public List<String> upgradeMaximumLore = List.of(
-        "<red>This upgrade is already at its maximum."
+        "<green>Ulepszone do maksimum!"
     );
 
     private static Map<UpgradeKind, MinionPanelElementConfig> defaultUpgradeElements() {
@@ -98,27 +100,28 @@ public final class MinionPanelConfig extends ConfigurationFile {
                 DefaultUpgradeKinds.SPEED, element(
             MinionPanelAction.NONE,
             XMaterial.SUGAR,
-            "<yellow>Speed <white>{UPGRADE_TIER}/{UPGRADE_MAX_TIER}",
-            "<gray>Work interval:",
-            "<white>{UPGRADE_VALUE} ticks <dark_gray>→ <green>{UPGRADE_NEXT_VALUE} ticks",
+            "<green>Szybkość <dark_gray>({UPGRADE_TIER}/{UPGRADE_MAX_TIER})",
+            "<gray>Przerwa między kolejnymi",
+            "<gray>zadaniami minionka:",
+            "<aqua>{UPGRADE_VALUE} <dark_gray>→ <aqua>{UPGRADE_NEXT_VALUE} <dark_gray>(20 = 1 sekunda)",
             ""
         ));
         elements.put(
                 DefaultUpgradeKinds.RANGE, element(
             MinionPanelAction.NONE,
             XMaterial.SPYGLASS,
-            "<yellow>Range <white>{UPGRADE_TIER}/{UPGRADE_MAX_TIER}",
-            "<gray>Work radius:",
-            "<white>{UPGRADE_VALUE} <dark_gray>→ <green>{UPGRADE_NEXT_VALUE}",
+            "<green>Zasięg <dark_gray>({UPGRADE_TIER}/{UPGRADE_MAX_TIER})",
+            "<gray>Na ile bloków wokół siebie pracuje:",
+            "<aqua>{UPGRADE_VALUE} <dark_gray>→ <aqua>{UPGRADE_NEXT_VALUE}",
             ""
         ));
         elements.put(
                 DefaultUpgradeKinds.CAPACITY, element(
             MinionPanelAction.NONE,
             XMaterial.CHEST,
-            "<yellow>Capacity <white>{UPGRADE_TIER}/{UPGRADE_MAX_TIER}",
-            "<gray>Storage slots:",
-            "<white>{UPGRADE_VALUE} <dark_gray>→ <green>{UPGRADE_NEXT_VALUE}",
+            "<green>Pojemność <dark_gray>({UPGRADE_TIER}/{UPGRADE_MAX_TIER})",
+            "<gray>Miejsca w magazynie minionka:",
+            "<aqua>{UPGRADE_VALUE} <dark_gray>→ <aqua>{UPGRADE_NEXT_VALUE}",
             ""
         ));
         return elements;
@@ -137,82 +140,109 @@ public final class MinionPanelConfig extends ConfigurationFile {
     public MinionPanelElementConfig lockedStorageSlot = element(
         MinionPanelAction.NONE,
         XMaterial.GRAY_STAINED_GLASS_PANE,
-        "<red>Locked storage slot",
-        "<gray>Unlock more slots with the capacity upgrade."
+        "<red>Zablokowane miejsce",
+        "<gray>Odblokujesz je ulepszeniem",
+        "<aqua>Pojemność<gray>."
     );
 
     private static Map<Character, MinionPanelElementConfig> defaultElements() {
         Map<Character, MinionPanelElementConfig> elements = new LinkedHashMap<>();
-        elements.put('#', element(MinionPanelAction.NONE, XMaterial.BLACK_STAINED_GLASS_PANE, " "));
-        elements.put('T', element(
-            MinionPanelAction.TOOL_SLOT,
-            XMaterial.GRAY_DYE,
-            "<red>No tool equipped",
-            "<gray>Click this slot while holding a tool."
-        ));
+        elements.put('#', element(MinionPanelAction.NONE, XMaterial.AIR, " "));
         elements.put('F', element(
             MinionPanelAction.FUEL_SLOT,
             XMaterial.COAL,
-            "<red>No fuel",
-            "<gray>Click this slot while holding minion fuel."
+            "<red>Brak paliwa",
+            "<gray>Paliwo przyspiesza minionka",
+            "<gray>albo daje mu inne bonusy.",
+            "",
+            "<yellow>Kliknij, trzymając paliwo!"
         ));
         elements.put('M', element(
             MinionPanelAction.FIRST_MODULE_SLOT,
             XMaterial.LIGHT_GRAY_DYE,
-            "<red>No module",
-            "<gray>Click this slot while holding a minion module."
+            "<red>Brak modułu",
+            "<gray>Moduł zmienia to, co minionek",
+            "<gray>produkuje, np. przetapia łup.",
+            "",
+            "<yellow>Kliknij, trzymając moduł!"
         ));
         elements.put('N', element(
             MinionPanelAction.SECOND_MODULE_SLOT,
             XMaterial.LIGHT_GRAY_DYE,
-            "<red>No module",
-            "<gray>Click this slot while holding a minion module."
-        ));
-        elements.put('S', element(
-            MinionPanelAction.STORAGE_SLOT,
-            XMaterial.GRAY_STAINED_GLASS_PANE,
-            "<dark_gray>Empty storage slot"
+            "<red>Brak modułu",
+            "<gray>Moduł zmienia to, co minionek",
+            "<gray>produkuje, np. przetapia łup.",
+            "",
+            "<yellow>Kliknij, trzymając moduł!"
         ));
         elements.put('I', element(
             MinionPanelAction.MINION_INFORMATION,
-            XMaterial.BOOK,
-            "<green>Minion Information",
-            "<gray>Profession: <white>{MINION_BEHAVIOR}",
-            "<gray>Level: <white>{MINION_LEVEL}/{MINION_MAX_LEVEL}",
-            "<gray>Progress to the next level:",
-            "{MINION_PROGRESS_BAR} <white>{MINION_PROGRESS}<gray>/<white>{MINION_PROGRESS_REQUIRED}",
-            "<gray>Storage: <white>{STORAGE_USED}/{STORAGE_CAPACITY}"
+            XMaterial.NETHER_STAR,
+            "<green>Minionek {MINION_BEHAVIOR}",
+            "<gray>Poziom: <gold>{MINION_LEVEL}<dark_gray>/<gold>{MINION_MAX_LEVEL}",
+            "<gray>Wykonane prace: <aqua>{MINION_PROGRESS}",
+            "<gray>Następny poziom przy: <aqua>{MINION_PROGRESS_REQUIRED}",
+            "{MINION_PROGRESS_BAR}",
+            "",
+            "<gray>Magazyn: <aqua>{STORAGE_USED}<dark_gray>/<aqua>{STORAGE_CAPACITY}",
+            "<gray>Paliwo: <aqua>{MINION_FUEL_TIME}",
+            "<gray>Kierunek: <aqua>{MINION_DIRECTION}",
+            "<gray>Skrzynia: {MINION_CHEST}"
         ));
-        elements.put('U', element(
-            MinionPanelAction.UPGRADES,
-            XMaterial.EXPERIENCE_BOTTLE,
-            "<yellow>Upgrades",
-            "<gray>Click to open the upgrades panel."
-        ));
-        elements.put('L', element(
-            MinionPanelAction.LINK_CHEST,
-            XMaterial.HOPPER,
-            "<yellow>Linked Chest",
-            "<gray>Chest: <white>{MINION_CHEST}",
-            "<gray>Click to link or unlink a chest."
+        elements.put('S', element(MinionPanelAction.STORAGE_SLOT, XMaterial.AIR, " "));
+        elements.put('T', element(
+            MinionPanelAction.TOOL_SLOT,
+            XMaterial.GRAY_DYE,
+            "<red>Brak narzędzia",
+            "<gray>Bez narzędzia minionek",
+            "<gray>nie zabierze się do pracy.",
+            "",
+            "<yellow>Kliknij, trzymając narzędzie!"
         ));
         elements.put('R', element(
             MinionPanelAction.ROTATE,
             XMaterial.COMPASS,
-            "<yellow>Rotation",
-            "<gray>Direction: <white>{MINION_DIRECTION}",
-            "<gray>Click to rotate by 90°."
+            "<green>Kierunek pracy",
+            "<gray>Teraz: <aqua>{MINION_DIRECTION}",
+            "",
+            "<yellow>Kliknij, aby obrócić!"
         ));
         elements.put('C', element(
             MinionPanelAction.COLLECT_ITEMS,
             XMaterial.CHEST,
-            "<green>Collect Items",
-            "<gray>Storage: <white>{STORAGE_USED}/{STORAGE_CAPACITY}"
+            "<green>Zabierz przedmioty",
+            "<gray>W magazynie: <aqua>{STORAGE_USED}<dark_gray>/<aqua>{STORAGE_CAPACITY}",
+            "",
+            "<yellow>Kliknij, aby zabrać wszystko!"
+        ));
+        elements.put('L', element(
+            MinionPanelAction.LINK_CHEST,
+            XMaterial.HOPPER,
+            "<green>Podłączona skrzynia",
+            "<gray>Łup trafia prosto do tej skrzyni,",
+            "<gray>a gdy się zapełni, do magazynu.",
+            "",
+            "<gray>Skrzynia: {MINION_CHEST}",
+            "",
+            "<yellow>Kliknij, aby podłączyć lub odłączyć!"
+        ));
+        elements.put('U', element(
+            MinionPanelAction.UPGRADES,
+            XMaterial.EXPERIENCE_BOTTLE,
+            "<green>Ulepszenia",
+            "<gray>Szybkość, zasięg i pojemność",
+            "<gray>minionka za monety wyspy.",
+            "",
+            "<yellow>Kliknij, aby zobaczyć!"
         ));
         elements.put('P', element(
             MinionPanelAction.PICKUP_MINION,
             XMaterial.BARRIER,
-            "<red>Pick Up Minion"
+            "<red>Podnieś minionka",
+            "<gray>Wróci do ekwipunku razem",
+            "<gray>z poziomem, ulepszeniami i narzędziem.",
+            "",
+            "<yellow>Kliknij, aby podnieść!"
         ));
         return elements;
     }

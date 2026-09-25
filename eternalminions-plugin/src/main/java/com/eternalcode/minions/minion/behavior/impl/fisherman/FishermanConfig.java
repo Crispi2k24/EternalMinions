@@ -67,15 +67,15 @@ public final class FishermanConfig extends AbstractMinionConfig {
     public Map<XMaterial, Integer> treasureLoot = defaultTreasureLoot();
 
     public FishermanConfig() {
-        this.displayName = "<color:#4498DB:#5CB6FF:#4498DB>ꜰɪꜱʜᴇʀᴍᴀɴ";
+        this.displayName = "<color:#4498DB:#5CB6FF:#4498DB>ʀʏʙᴀᴋ";
         this.workIntervalTicks = 200;
 
         this.tool.category = ToolCategory.FISHING_ROD;
         this.tool.required = true;
         this.upgrades.put(
                 DefaultUpgradeKinds.SPEED, List.of(
-                new MinionUpgradeTierConfig(2, 170, new BigDecimal("8.00")),
-                new MinionUpgradeTierConfig(3, 140, new BigDecimal("16.00"))
+                new MinionUpgradeTierConfig(2, 170, new BigDecimal("3000.00")),
+                new MinionUpgradeTierConfig(3, 140, new BigDecimal("25000.00"))
         ));
 
         this.items.helmet.texture =
@@ -88,24 +88,18 @@ public final class FishermanConfig extends AbstractMinionConfig {
 
         this.statuses = defaultStatuses();
 
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-                "<gray>1. Place the fisherman next to a body of water.",
-                "<gray>2. Insert a fishing rod into the tool slot.",
-                "<gray>3. Leave enough storage space for the catch.",
+                "<gray>Łowi ryby w wodzie tuż obok siebie.",
                 "",
-                "<dark_gray>Water requirements:",
-                "<gray>• At least <white>9</white> surface water blocks.",
-                "<gray>• At least <white>2</white> blocks deep.",
-                "<gray>• Clear space above the surface.",
+                "<gray>• Włóż <aqua>wędkę <gray>w pole narzędzia.",
+                "<gray>• Woda musi mieć co najmniej <aqua>9 <gray>bloków",
+                "<gray>  tafli i <aqua>2 <gray>bloki głębokości.",
+                "<gray>• Nad wodą nie może nic stać.",
                 "",
-                "<dark_gray>Fishing:",
-                "<gray>• Each attempt takes <white>10 seconds</white> by default.",
-                "<gray>• An attempt may end without a catch.",
-                "",
-                "<dark_gray>Enchantments:",
-                "<aqua>• Lure <gray>reduces the wait time.",
-                "<aqua>• Luck of the Sea <gray>improves the catch.",
-                "<aqua>• Unbreaking <gray>reduces rod durability loss."
+                "<dark_gray>Zaklęcia wędki skracają czekanie",
+                "<dark_gray>i dają lepszy połów. Nie każda",
+                "<dark_gray>próba kończy się rybą."
         );
     }
 
@@ -150,37 +144,37 @@ public final class FishermanConfig extends AbstractMinionConfig {
 
         statuses.put(
                 FishermanStatuses.CATCHING,
-                "<green>Reeling in the catch..."
+                "<green>Wyciąga zdobycz..."
         );
 
         statuses.put(
                 FishermanStatuses.NOTHING_CAUGHT,
-                "<gray>Nothing caught this time"
+                "<gray>Tym razem nic nie złowił"
         );
 
         statuses.put(
                 FishermanStatuses.NO_WATER_NEARBY,
-                "<red>No water nearby"
+                "<red>Brak wody w pobliżu"
         );
 
         statuses.put(
                 FishermanStatuses.WATER_TOO_SMALL,
-                "<yellow>Water area too small"
+                "<red>Zbiornik jest za mały"
         );
 
         statuses.put(
                 FishermanStatuses.WATER_TOO_SHALLOW,
-                "<yellow>Water too shallow"
+                "<red>Woda jest za płytka"
         );
 
         statuses.put(
                 FishermanStatuses.WATER_SURFACE_BLOCKED,
-                "<yellow>Water surface obstructed"
+                "<red>Tafla wody jest zasłonięta"
         );
 
         statuses.put(
                 FishermanStatuses.NO_ROD,
-                "<red>Fishing rod required"
+                "<red>Brakuje wędki"
         );
 
         return statuses;

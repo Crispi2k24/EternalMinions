@@ -94,7 +94,7 @@ public final class LumberjackConfig extends AbstractMinionConfig {
     public int leafSearchRadius = 6;
 
     public LumberjackConfig() {
-        this.displayName = "<color:#BE7B00:#E09712:#BE7B00>ʟᴜᴍʙᴇʀᴊᴀᴄᴋ";
+        this.displayName = "<color:#BE7B00:#E09712:#BE7B00>ᴅʀᴡᴀʟ";
 
         this.tool.category = ToolCategory.AXE;
         this.tool.required = true;
@@ -109,20 +109,19 @@ public final class LumberjackConfig extends AbstractMinionConfig {
 
         this.statuses = defaultStatuses();
 
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-                "<gray>1. Insert an axe into the tool slot.",
-                "<gray>2. Set the work direction in the minion panel.",
-                "<gray>3. Plant saplings in a line in front of the minion.",
-                "<gray>4. Wait for the trees to grow.",
+                "<gray>Ścina drzewa rosnące w linii przed nim",
+                "<gray>i sadzi je z powrotem.",
                 "",
-                "<dark_gray>Behavior:",
-                "<aqua>• The lumberjack can fell large trees.",
-                "<aqua>• Natural leaves are removed automatically.",
-                "<aqua>• Bee nests and beehives attached to trees are removed.",
-                "<aqua>• 2x2 trunks are replanted in a 2x2 pattern.",
-                "<aqua>• Fortune and Silk Touch affect block drops.",
+                "<gray>• Włóż <aqua>siekierę <gray>w pole narzędzia.",
+                "<gray>• Posadź sadzonki w linii, w którą patrzy,",
+                "<gray>  na jego wysokości.",
+                "<gray>• Więcej drzew naraz daje ulepszenie <aqua>Zasięg<gray>.",
                 "",
-                "<yellow>Leaves placed by players are protected."
+                "<dark_gray>Drzewa 2x2 sadzi z powrotem jako 2x2.",
+                "<dark_gray>Liście postawione ręcznie zostają.",
+                "<dark_gray>Szczęście i Jedwabny dotyk działają."
         );
     }
 
@@ -202,37 +201,37 @@ public final class LumberjackConfig extends AbstractMinionConfig {
 
         statuses.put(
                 LumberjackStatuses.CUTTING,
-                "<green>Felling tree..."
+                "<green>Ścina drzewo..."
         );
 
         statuses.put(
                 LumberjackStatuses.WAITING_FOR_TREE,
-                "<yellow>Waiting for a tree to grow"
+                "<gray>Czeka, aż drzewo urośnie"
         );
 
         statuses.put(
                 LumberjackStatuses.NO_SAPLING,
-                "<red>No sapling at the work station"
+                "<red>Brak sadzonki na stanowisku"
         );
 
         statuses.put(
                 LumberjackStatuses.INVALID_STATION,
-                "<red>Work station obstructed"
+                "<red>Stanowisko pracy zablokowane"
         );
 
         statuses.put(
                 LumberjackStatuses.TREE_TOO_LARGE,
-                "<red>Tree exceeds the configured size limit"
+                "<red>Drzewo jest za duże"
         );
 
         statuses.put(
                 LumberjackStatuses.CANOPY_TOO_LARGE,
-                "<red>Canopy exceeds the configured size limit"
+                "<red>Korona drzewa jest za duża"
         );
 
         statuses.put(
                 LumberjackStatuses.NO_AXE,
-                "<red>Axe required"
+                "<red>Brakuje siekiery"
         );
 
         return statuses;

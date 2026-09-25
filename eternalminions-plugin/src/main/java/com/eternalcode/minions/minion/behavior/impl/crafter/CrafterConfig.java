@@ -26,7 +26,7 @@ public final class CrafterConfig extends AbstractMinionConfig {
     public int maximumCraftsSafetyCap = 64;
 
     public CrafterConfig() {
-        this.displayName = "<color:#FFB900:#FFD158:#FFB900>ᴄʀᴀꜰᴛᴇʀ";
+        this.displayName = "<color:#FFB900:#FFD158:#FFB900>ʀᴢᴇᴍɪᴇꜱʟɴɪᴋ";
 
         this.tool.category = ToolCategory.ANY;
         this.tool.required = false;
@@ -42,11 +42,16 @@ public final class CrafterConfig extends AbstractMinionConfig {
         );
 
         this.statuses = defaultStatuses();
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-            "<gray>1. Link a chest to the minion.",
-            "<gray>2. Place crafting ingredients inside the chest.",
-            "<gray>3. The minion will craft available recipes automatically.",
-            "<gray>4. Leave enough room for the crafted items."
+            "<gray>Wytwarza wybrany przedmiot ze",
+            "<gray>składników w podłączonej skrzyni.",
+            "",
+            "<gray>• W pole narzędzia włóż przedmiot,",
+            "<gray>  który ma wytwarzać.",
+            "<gray>• Podłącz skrzynię i włóż do niej składniki.",
+            "",
+            "<dark_gray>Gotowe przedmioty trafiają do magazynu."
         );
     }
 
@@ -56,22 +61,22 @@ public final class CrafterConfig extends AbstractMinionConfig {
 
         statuses.put(
                 CrafterStatuses.CRAFTING,
-                "<green>Crafting items..."
+                "<green>Wytwarza przedmioty..."
         );
 
         statuses.put(
                 CrafterStatuses.NO_RECIPE_SELECTED,
-                "<red>No recipe selected"
+                "<red>Nie wybrano, co wytwarzać"
         );
 
         statuses.put(
                 CrafterStatuses.NO_CHEST,
-                "<red>Linked chest required"
+                "<red>Brakuje podłączonej skrzyni"
         );
 
         statuses.put(
                 CrafterStatuses.NO_INGREDIENTS,
-                "<yellow>Missing ingredients"
+                "<gray>Czeka na składniki"
         );
 
         return statuses;

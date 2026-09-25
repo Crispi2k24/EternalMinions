@@ -34,12 +34,12 @@ public final class MinionsConfig extends ConfigurationFile {
 
     private static Map<MinionStatus, String> defaultStatuses() {
         Map<MinionStatus, String> statuses = new LinkedHashMap<>();
-        statuses.put(CoreMinionStatuses.IDLE, "<gray>Idle");
-        statuses.put(CoreMinionStatuses.NO_TOOL, "<red>Tool required");
-        statuses.put(CoreMinionStatuses.STORAGE_FULL, "<red>Storage full");
-        statuses.put(CoreMinionStatuses.OFFLINE, "<dark_gray>Owner offline");
-        statuses.put(CoreMinionStatuses.AWAY, "<dark_gray>Owner out of range");
-        statuses.put(CoreMinionStatuses.BLOCKED, "<red>Blocked by protection");
+        statuses.put(CoreMinionStatuses.IDLE, "<gray>Czeka na pracę");
+        statuses.put(CoreMinionStatuses.NO_TOOL, "<red>Brakuje narzędzia");
+        statuses.put(CoreMinionStatuses.STORAGE_FULL, "<red>Magazyn pełny");
+        statuses.put(CoreMinionStatuses.OFFLINE, "<dark_gray>Właściciel jest poza grą");
+        statuses.put(CoreMinionStatuses.AWAY, "<dark_gray>Właściciel jest za daleko");
+        statuses.put(CoreMinionStatuses.BLOCKED, "<red>Zablokowane przez ochronę");
         return statuses;
     }
 
@@ -84,7 +84,7 @@ public final class MinionsConfig extends ConfigurationFile {
             "the highest granted number wins. Grant eternalminions.limit.* for no limit at all.",
             "Players without any eternalminions.limit.<amount> permission fall back to this default."
         })
-        public int defaultLimit = 5;
+        public int defaultLimit = 500;
     }
 
     public static class HologramConfig extends OkaeriConfig {
@@ -99,10 +99,10 @@ public final class MinionsConfig extends ConfigurationFile {
                 "{STATUS} - current runtime work status"
         })
         public List<String> hologramLines = List.of(
-                "<b><gradient:#FACC15:#FFE15F:#FACC15>{TYPE}</gradient></b>",
-                "<#FFE15F>Owner: <white>{OWNER}",
-                "<#FFE15F>Level: <white>{LEVEL}",
-                "<#FFE15F>Status: <white>{STATUS}"
+                "<bold>{TYPE}</bold>",
+                "<gray>Właściciel: <aqua>{OWNER}",
+                "<gray>Poziom: <gold>{LEVEL}",
+                "{STATUS}"
         );
 
         @Comment({

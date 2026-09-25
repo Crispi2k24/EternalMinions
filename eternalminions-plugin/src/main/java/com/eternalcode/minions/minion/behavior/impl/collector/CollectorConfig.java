@@ -29,18 +29,21 @@ public final class CollectorConfig extends AbstractMinionConfig {
     public int maxCollectedStacksPerCycle = 1;
 
     public CollectorConfig() {
-        this.displayName = "<color:#FCD05C:#FFDE87:#FCD05C>ᴄᴏʟʟᴇᴄᴛᴏʀ";
+        this.displayName = "<color:#FCD05C:#FFDE87:#FCD05C>ᴢʙɪᴇʀᴀᴄᴢ";
         this.tool.category = ToolCategory.SHOVEL;
         this.tool.required = true;
         this.items.helmet.texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2UzZDM2MzVjZTQxMWFiZjFlNGYzNzNkMTYxZDA3YjhjNDdlMzU5YjZjNTZmNzRiNDEzY2I0OTRhYzc0NmUyZCJ9fX0=";
         this.npcSkin = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vcy5uYW1lbWMuY29tL2kvODNjZGI4NmI4ZjFjYWE4MS5wbmcifX19";
         this.items.setLeatherArmorColor(Color.fromRGB(252, 208, 92));
         this.statuses = defaultStatuses();
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-            "<gray>1. Place the minion where dropped items appear.",
-            "<gray>2. Insert a shovel into the tool slot.",
-            "<gray>3. The minion will collect nearby dropped items.",
-            "<gray>4. Link a chest or collect items from its storage."
+            "<gray>Zbiera przedmioty leżące na ziemi",
+            "<gray>w promieniu <aqua>4 <gray>bloków.",
+            "",
+            "<gray>• Włóż <aqua>łopatę <gray>w pole narzędzia.",
+            "<gray>• Postaw go tam, gdzie spada łup,",
+            "<gray>  np. przy farmie albo zabójcy."
         );
     }
 
@@ -59,9 +62,9 @@ public final class CollectorConfig extends AbstractMinionConfig {
 
     private static Map<MinionStatus, String> defaultStatuses() {
         Map<MinionStatus, String> statuses = new LinkedHashMap<>();
-        statuses.put(CollectorStatuses.COLLECTING, "<green>Collecting items...");
-        statuses.put(CollectorStatuses.NO_ITEMS_ON_GROUND, "<yellow>No items nearby");
-        statuses.put(CollectorStatuses.NO_SHOVEL, "<red>Shovel required");
+        statuses.put(CollectorStatuses.COLLECTING, "<green>Zbiera przedmioty...");
+        statuses.put(CollectorStatuses.NO_ITEMS_ON_GROUND, "<gray>Brak przedmiotów w pobliżu");
+        statuses.put(CollectorStatuses.NO_SHOVEL, "<red>Brakuje łopaty");
         return statuses;
     }
 }

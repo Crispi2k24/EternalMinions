@@ -70,7 +70,7 @@ public final class KillerConfig extends AbstractMinionConfig {
 
     public KillerConfig() {
         this.displayName =
-                "<color:#F11919:#FF3F3F:#F11919>ᴋɪʟʟᴇʀ";
+                "<color:#F11919:#FF3F3F:#F11919>ᴢᴀʙᴏᴊᴄᴀ";
 
         this.tool.category = ToolCategory.WEAPON;
         this.tool.required = true;
@@ -87,23 +87,17 @@ public final class KillerConfig extends AbstractMinionConfig {
 
         this.statuses = defaultStatuses();
 
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-                "<gray>1. Place the killer near a mob spawning area.",
-                "<gray>2. Insert a weapon into the tool slot.",
-                "<gray>3. The killer will attack the nearest valid target.",
-                "<gray>4. Drops go to its storage or linked chest.",
+                "<gray>Atakuje moby w promieniu <aqua>4 <gray>bloków.",
                 "",
-                "<dark_gray>Supported enchantments:",
-                "<red>• Sharpness <gray>— increases damage against all mobs.",
-                "<red>• Smite <gray>— increases damage against undead mobs.",
-                "<red>• Bane of Arthropods <gray>— increases damage against arthropods.",
-                "<red>• Fire Aspect <gray>— ignites targets; higher levels burn longer.",
-                "<red>• Knockback <gray>— pushes targets away; higher levels increase force.",
-                "<red>• Looting <gray>— increases drops from defeated mobs.",
-                "<red>• Sweeping Edge <gray>— enables attacks against all mobs in range.",
-                "<red>• Unbreaking <gray>— reduces weapon durability loss.",
+                "<gray>• Włóż <aqua>broń <gray>w pole narzędzia.",
+                "<gray>• Postaw go przy spawnerze albo farmie mobów.",
+                "<gray>• Zaklęcia miecza działają jak u gracza,",
+                "<gray>  <aqua>Grabież <gray>daje więcej łupu.",
                 "",
-                "<yellow>Named and invulnerable mobs are protected."
+                "<dark_gray>Nazwanych i nieśmiertelnych mobów",
+                "<dark_gray>nie rusza."
         );
     }
 
@@ -156,22 +150,22 @@ public final class KillerConfig extends AbstractMinionConfig {
 
         statuses.put(
                 KillerStatuses.ATTACKING,
-                "<red>Attacking..."
+                "<green>Atakuje..."
         );
 
         statuses.put(
                 KillerStatuses.NO_ENEMIES,
-                "<yellow>No targets in range"
+                "<gray>Brak celów w zasięgu"
         );
 
         statuses.put(
                 KillerStatuses.PROTECTED_MOBS_NEARBY,
-                "<yellow>Only protected mobs nearby"
+                "<gray>W pobliżu są tylko chronione moby"
         );
 
         statuses.put(
                 KillerStatuses.NO_WEAPON,
-                "<red>Weapon required"
+                "<red>Brakuje broni"
         );
 
         return statuses;

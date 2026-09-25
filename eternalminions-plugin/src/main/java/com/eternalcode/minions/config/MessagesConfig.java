@@ -10,51 +10,51 @@ public final class MessagesConfig extends ConfigurationFile {
         return dataDirectory.resolve("messages.yml");
     }
 
-    public Notice noPermission = Notice.chat(prefix() + "<red>You do not have permission to use this command.");
-    public Notice playerNotFound = Notice.chat(prefix() + "<red>Player not found.");
-    public Notice playerOnly = Notice.chat(prefix() + "<red>Only players can use this command.");
-    public Notice correctUsage = Notice.chat(prefix() + "<white>Correct usage: <green>{USAGE}");
-    public Notice correctUsageHead = Notice.chat(prefix() + "<white>Correct usage:");
-    public Notice correctUsageEntry = Notice.chat("<dark_gray>➤</dark_gray> <green>{USAGE}");
-    public Notice reloadCompleted = Notice.chat(prefix() + "<green>Configuration reloaded successfully.");
+    public Notice noPermission = Notice.chat(prefix() + "<red>Nie masz uprawnień do tej komendy.");
+    public Notice playerNotFound = Notice.chat(prefix() + "<red>Nie znaleziono gracza.");
+    public Notice playerOnly = Notice.chat(prefix() + "<red>Tej komendy może użyć tylko gracz.");
+    public Notice correctUsage = Notice.chat(prefix() + "<gray>Poprawne użycie: <aqua>{USAGE}");
+    public Notice correctUsageHead = Notice.chat(prefix() + "<gray>Poprawne użycie:");
+    public Notice correctUsageEntry = Notice.chat("<dark_gray>-</dark_gray> <aqua>{USAGE}");
+    public Notice reloadCompleted = Notice.chat(prefix() + "<green>Konfiguracja przeładowana.");
 
-    public Notice minionToolUpdated = Notice.chat(prefix() + "<green>Minion tool updated.");
-    public Notice minionStorageCollected = Notice.chat(prefix() + "<green>Items collected from the minion's storage.");
+    public Notice minionToolUpdated = Notice.chat(prefix() + "<green>Narzędzie minionka zostało zmienione.");
+    public Notice minionStorageCollected = Notice.chat(prefix() + "<green>Zabrano zawartość magazynu minionka.");
     public Notice minionPickedUp = Notice.chat(
-        prefix() + "<green>Minion picked up. <gray>({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})"
+        prefix() + "<green>Minionek podniesiony. <dark_gray>({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})"
     );
-    public Notice minionOwnerRequired = Notice.chat(prefix() + "<red>Only the owner can manage this minion.");
-    public Notice minionNotFound = Notice.chat(prefix() + "<red>This minion no longer exists.");
+    public Notice minionOwnerRequired = Notice.chat(prefix() + "<red>Tym minionkiem zarządza tylko jego właściciel.");
+    public Notice minionNotFound = Notice.chat(prefix() + "<red>Tego minionka już nie ma.");
     public Notice minionPlaced = Notice.chat(
-        prefix() + "<green>Minion placed. <gray>({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})"
+        prefix() + "<green>Minionek postawiony. <dark_gray>({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})"
     );
-    public Notice minionItemReceived = Notice.chat(prefix() + "<green>Minion item received.");
-    public Notice minionPlacementBlocked = Notice.chat(prefix() + "<red>You cannot place a minion here.");
-    public Notice blockPlacementBlockedByMinion = Notice.chat(prefix() + "<red>You cannot place a block on a minion.");
-    public Notice minionTypeUnknown = Notice.chat(prefix() + "<red>Unknown minion type.");
-    public Notice addonReceived = Notice.chat(prefix() + "<green>Minion addon received.");
-    public Notice addonUnknown = Notice.chat(prefix() + "<red>Unknown minion addon.");
-    public Notice addonWrongSlot = Notice.chat(prefix() + "<red>This item does not fit into this slot.");
+    public Notice minionItemReceived = Notice.chat(prefix() + "<green>Otrzymałeś minionka.");
+    public Notice minionPlacementBlocked = Notice.chat(prefix() + "<red>Tutaj nie postawisz minionka.");
+    public Notice blockPlacementBlockedByMinion = Notice.chat(prefix() + "<red>Nie postawisz bloku na minionku.");
+    public Notice minionTypeUnknown = Notice.chat(prefix() + "<red>Nie ma takiego rodzaju minionka.");
+    public Notice addonReceived = Notice.chat(prefix() + "<green>Otrzymałeś przedmiot dla minionka.");
+    public Notice addonUnknown = Notice.chat(prefix() + "<red>Nie ma takiego paliwa ani modułu.");
+    public Notice addonWrongSlot = Notice.chat(prefix() + "<red>Ten przedmiot nie pasuje do tego pola.");
     public Notice minionLimitReached = Notice.chat(
-        prefix() + "<red>You have reached your minion limit ({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})."
+        prefix() + "<red>Osiągnąłeś limit minionków <dark_gray>({MINION_LIMIT_CURRENT}/{MINION_LIMIT_MAX})<red>."
     );
-    public Notice upgradePurchased = Notice.chat(prefix() + "<green>Upgrade purchased.");
-    public Notice upgradeMaxed = Notice.chat(prefix() + "<red>This upgrade is already at its maximum tier.");
-    public Notice upgradeRequiresLevel = Notice.chat(prefix() + "<red>This minion's level is too low for that upgrade.");
-    public Notice upgradeCannotAfford = Notice.chat(prefix() + "<red>You cannot afford this upgrade, or the economy is unavailable.");
+    public Notice upgradePurchased = Notice.chat(prefix() + "<green>Ulepszenie kupione.");
+    public Notice upgradeMaxed = Notice.chat(prefix() + "<red>To ulepszenie jest już na najwyższym poziomie.");
+    public Notice upgradeRequiresLevel = Notice.chat(prefix() + "<red>Ten minionek ma za niski poziom na to ulepszenie.");
+    public Notice upgradeCannotAfford = Notice.chat(prefix() + "<red>Nie stać cię na to ulepszenie.");
 
-    public Notice chestLinkStart = Notice.chat(prefix() + "<white>Right-click a chest to link it to this minion.");
-    public Notice chestLinked = Notice.chat(prefix() + "<green>Chest linked to the minion.");
-    public Notice chestUnlinked = Notice.chat(prefix() + "<green>Chest unlinked from the minion.");
-    public Notice chestLinkTooFar = Notice.chat(prefix() + "<red>That chest is too far away from the minion.");
-    public Notice chestLinkUnsupported = Notice.chat(prefix() + "<red>A minion cannot be linked to this container.");
-    public Notice chestLinkExpired = Notice.chat(prefix() + "<red>Chest selection timed out.");
+    public Notice chestLinkStart = Notice.chat(prefix() + "<gray>Kliknij PPM skrzynię, aby podłączyć ją do minionka.");
+    public Notice chestLinked = Notice.chat(prefix() + "<green>Skrzynia podłączona do minionka.");
+    public Notice chestUnlinked = Notice.chat(prefix() + "<green>Skrzynia odłączona od minionka.");
+    public Notice chestLinkTooFar = Notice.chat(prefix() + "<red>Ta skrzynia jest za daleko od minionka.");
+    public Notice chestLinkUnsupported = Notice.chat(prefix() + "<red>Minionka nie da się podłączyć pod ten pojemnik.");
+    public Notice chestLinkExpired = Notice.chat(prefix() + "<red>Minął czas na wybranie skrzyni.");
     public Notice chestLinkDestroyed =
-        Notice.chat(prefix() + "<red>The container linked to your minion was destroyed, so the link was removed.");
+        Notice.chat(prefix() + "<red>Skrzynia podłączona do twojego minionka została zniszczona.");
 
-    public Notice minionRotated = Notice.chat(prefix() + "<green>Minion rotated.");
+    public Notice minionRotated = Notice.chat(prefix() + "<green>Minionek obrócony.");
 
     private static String prefix() {
-        return "<b><gradient:#FACC15:#FFE15F:#FACC15>ᴍɪɴɪᴏɴꜱ</gradient></b> <dark_gray>➤</dark_gray> ";
+        return "<white><bold>MINIONKI > </bold>";
     }
 }

@@ -21,18 +21,23 @@ public final class SellerConfig extends AbstractMinionConfig {
     }
 
     public SellerConfig() {
-        this.displayName = "<color:#DD00FF:#FF55FF:#DD00FF>ꜱᴇʟʟᴇʀ";
+        this.displayName = "<color:#DD00FF:#FF55FF:#DD00FF>ꜱᴘʀᴢᴇᴅᴀᴡᴄᴀ";
         this.tool.category = ToolCategory.ANY;
         this.tool.required = false;
         this.items.helmet.texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI0YmE3NjBhNjFkZDI1NmM1MmIzMjUxMjlmNDYwMTZhZTg5MjIzMmEwZGVhMTcxNWY5OTdmN2M0ZDYyMmJlZiJ9fX0=";
         this.npcSkin = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vcy5uYW1lbWMuY29tL2kvNDRmNGI1ZThlN2I2NzExMC5wbmcifX19";
         this.items.setLeatherArmorColor(Color.fromRGB(221, 0, 255));
         this.statuses = defaultStatuses();
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-            "<gray>1. Place items in the minion's storage.",
-            "<gray>2. You can also link a chest containing items.",
-            "<gray>3. The minion will sell items supported by the shop.",
-            "<gray>4. Sale proceeds are paid to the minion's owner."
+            "<gray>Sprzedaje przedmioty w sklepie wyspy,",
+            "<gray>a monety trafiają do właściciela.",
+            "",
+            "<gray>• Wrzuć przedmioty do jego magazynu",
+            "<gray>  albo podłącz skrzynię z łupem.",
+            "<gray>• Sprzedaje tylko to, co skupuje sklep.",
+            "",
+            "<dark_gray>Nie potrzebuje narzędzia."
         );
     }
 
@@ -57,11 +62,11 @@ public final class SellerConfig extends AbstractMinionConfig {
 
     private static Map<MinionStatus, String> defaultStatuses() {
         Map<MinionStatus, String> statuses = new LinkedHashMap<>();
-        statuses.put(SellerStatuses.SELLING, "<green>Selling items...");
-        statuses.put(SellerStatuses.SHOP_NOT_LINKED, "<red>Shop integration unavailable");
-        statuses.put(SellerStatuses.STORAGE_EMPTY, "<yellow>Storage empty");
-        statuses.put(SellerStatuses.ITEM_HAS_NO_PRICE, "<red>Item has no sell price");
-        statuses.put(SellerStatuses.PAYOUT_FAILED, "<red>Could not pay the minion's owner");
+        statuses.put(SellerStatuses.SELLING, "<green>Sprzedaje przedmioty...");
+        statuses.put(SellerStatuses.SHOP_NOT_LINKED, "<red>Sklep jest niedostępny");
+        statuses.put(SellerStatuses.STORAGE_EMPTY, "<gray>Nie ma nic do sprzedania");
+        statuses.put(SellerStatuses.ITEM_HAS_NO_PRICE, "<red>Sklep tego nie skupuje");
+        statuses.put(SellerStatuses.PAYOUT_FAILED, "<red>Nie udało się wypłacić monet");
         return statuses;
     }
 }

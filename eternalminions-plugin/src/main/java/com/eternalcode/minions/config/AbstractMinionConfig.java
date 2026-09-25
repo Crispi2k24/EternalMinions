@@ -56,7 +56,7 @@ public abstract class AbstractMinionConfig extends ConfigurationFile {
     public List<String> itemLore = defaultItemLore();
 
     @Comment("Text used for {MINION_PROGRESS_REQUIRED} at the maximum level.")
-    public String maximumProgressText = "MAX";
+    public String maximumProgressText = "MAKS";
 
     @Comment({
         "Cumulative progress (finished actions) required to reach each next level.",
@@ -97,19 +97,19 @@ public abstract class AbstractMinionConfig extends ConfigurationFile {
 
     private static List<String> defaultItemLore() {
         return List.of(
-            "<gray>Level: <white>{MINION_LEVEL}<gray>/<white>{MINION_MAX_LEVEL}",
-            "<gray>Progress: <white>{MINION_PROGRESS}<gray>/<white>{MINION_PROGRESS_REQUIRED}",
-            "<gray>Storage: <white>{STORAGE_USED}<gray>/<white>{STORAGE_CAPACITY}",
+            "<gray>Poziom: <gold>{MINION_LEVEL}<dark_gray>/<gold>{MINION_MAX_LEVEL}",
+            "<gray>Wykonane prace: <aqua>{MINION_PROGRESS}",
+            "<gray>Magazyn: <aqua>{STORAGE_USED}<dark_gray>/<aqua>{STORAGE_CAPACITY}",
             "",
-            "<dark_gray>Right-click a block to place this minion."
+            "<yellow>Kliknij PPM na blok, aby postawić!"
         );
     }
 
     private static MinionPanelElementConfig defaultUsageInstructions() {
         MinionPanelElementConfig instructions = new MinionPanelElementConfig();
         instructions.material = XMaterial.KNOWLEDGE_BOOK;
-        instructions.displayName = "<yellow>How to Use";
-        instructions.lore = List.of("<gray>No usage instructions have been configured.");
+        instructions.displayName = "<green>Jak używać";
+        instructions.lore = List.of("<gray>Ten minionek nie ma jeszcze instrukcji.");
         return instructions;
     }
 
@@ -117,18 +117,18 @@ public abstract class AbstractMinionConfig extends ConfigurationFile {
         Map<UpgradeKind, List<MinionUpgradeTierConfig>> upgrades = new LinkedHashMap<>();
         upgrades.put(
                 DefaultUpgradeKinds.SPEED, List.of(
-            new MinionUpgradeTierConfig(2, 30, new BigDecimal("8.00")),
-            new MinionUpgradeTierConfig(3, 20, new BigDecimal("16.00"))
+            new MinionUpgradeTierConfig(2, 30, new BigDecimal("3000.00")),
+            new MinionUpgradeTierConfig(3, 20, new BigDecimal("25000.00"))
         ));
         upgrades.put(
                 DefaultUpgradeKinds.RANGE, List.of(
-            new MinionUpgradeTierConfig(2, 2, new BigDecimal("16.00")),
-            new MinionUpgradeTierConfig(4, 3, new BigDecimal("32.00"))
+            new MinionUpgradeTierConfig(2, 2, new BigDecimal("6000.00")),
+            new MinionUpgradeTierConfig(4, 3, new BigDecimal("40000.00"))
         ));
         upgrades.put(
                 DefaultUpgradeKinds.CAPACITY, List.of(
-            new MinionUpgradeTierConfig(3, 18, new BigDecimal("8.00")),
-            new MinionUpgradeTierConfig(4, 27, new BigDecimal("16.00"))
+            new MinionUpgradeTierConfig(3, 18, new BigDecimal("3000.00")),
+            new MinionUpgradeTierConfig(4, 27, new BigDecimal("20000.00"))
         ));
         return upgrades;
     }

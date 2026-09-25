@@ -48,7 +48,7 @@ public final class FarmerConfig extends AbstractMinionConfig {
     public Map<XMaterial, XMaterial> seeds = defaultSeeds();
 
     public FarmerConfig() {
-        this.displayName = "<color:#4CDD0A:#ACFF87:#4CDD0A>ꜰᴀʀᴍᴇʀ";
+        this.displayName = "<color:#4CDD0A:#ACFF87:#4CDD0A>ʀᴏʟɴɪᴋ";
 
         this.tool.category = ToolCategory.HOE;
         this.tool.required = true;
@@ -62,11 +62,17 @@ public final class FarmerConfig extends AbstractMinionConfig {
         this.items.setLeatherArmorColor(Color.fromRGB(76, 221, 10));
 
         this.statuses = defaultStatuses();
+        this.usageInstructions.displayName = "<green>Jak używać";
         this.usageInstructions.lore = List.of(
-            "<gray>1. Plant crops within the minion's work area.",
-            "<gray>2. Insert a hoe into the tool slot.",
-            "<gray>3. Keep seeds available for replanting.",
-            "<gray>4. Collect produce from its storage or linked chest."
+            "<gray>Zbiera dojrzałe plony wokół siebie",
+            "<gray>i od razu obsiewa pole na nowo.",
+            "",
+            "<gray>• Włóż <aqua>motykę <gray>w pole narzędzia.",
+            "<gray>• Uprawy posadź na jego wysokości.",
+            "<gray>• Pole rośnie z ulepszeniem <aqua>Zasięg<gray>.",
+            "",
+            "<dark_gray>Nasiona do siewu bierze z własnego",
+            "<dark_gray>zbioru, więc nie musisz ich dokładać."
         );
     }
 
@@ -107,27 +113,27 @@ public final class FarmerConfig extends AbstractMinionConfig {
 
         statuses.put(
                 FarmerStatuses.HARVESTING,
-                "<green>Harvesting crops..."
+                "<green>Zbiera plony..."
         );
 
         statuses.put(
                 FarmerStatuses.NO_MATURE_CROPS,
-                "<yellow>No mature crops nearby"
+                "<gray>Czeka, aż plony dojrzeją"
         );
 
         statuses.put(
                 FarmerStatuses.NO_SEEDS,
-                "<red>No seeds available for replanting"
+                "<red>Brak nasion do obsiania"
         );
 
         statuses.put(
                 FarmerStatuses.NO_HOE,
-                "<red>Hoe required"
+                "<red>Brakuje motyki"
         );
 
         statuses.put(
                 FarmerStatuses.NO_CONFIGURED_CROPS,
-                "<red>No valid crops configured"
+                "<red>Brak ustawionych upraw"
         );
 
         return statuses;
